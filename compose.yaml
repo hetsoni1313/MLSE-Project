@@ -1,0 +1,91 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: llmops
+      POSTGRES_USER: llmops
+      POSTGRES_PASSWORD: llmops
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U llmops"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  # FastAPI Gateway
+  gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://llmops:llmops@postgres:5432/llmops
+      LLAMA_SERVER_URL: http://llama-server:8081
+      ADMIN_API_KEY: ${ADMIN_API_KEY:-change-me-in-production}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      FAULT_INJECTION_ENABLED: ${FAULT_INJECTION_ENABLED:-false}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      ROUTING_MODE: ${ROUTING_MODE:-baseline}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
+  # Streamlit Dashboard
+  dashboard:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.dashboard
+    ports:
+      - "8501:8501"
+    environment:
+      DATABASE_URL: postgresql://llmops:llmops@postgres:5432/llmops
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  # llama.cpp Server (optional — requires model volume)
+  llama-server:
+    image: ghcr.io/ggerganov/llama.cpp:server
+    ports:
+      - "8081:8081"
+    volumes:
+      - ${MODEL_CACHE_DIR:-~/.cache/llmops-governance/models}:/models:ro
+    command: >
+      --model /models/qwen2.5-1.5b-instruct-q4_k_m.gguf
+      --host 0.0.0.0
+      --port 8081
+      --ctx-size 2048
+      --threads 4
+      --n-predict 30
+    profiles:
+      - full
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+
+volumes:
+  pgdata:
+    driver: local
+

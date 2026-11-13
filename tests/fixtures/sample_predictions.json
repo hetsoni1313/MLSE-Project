@@ -1,0 +1,12 @@
+[
+  {"text": "How do I get a new card?", "ground_truth": "get_physical_card", "prediction": "get_physical_card", "route": "baseline", "latency_ms": 120.5, "input_tokens": 800, "output_tokens": 8},
+  {"text": "My card was stolen yesterday", "ground_truth": "lost_or_stolen_card", "prediction": "lost_or_stolen_card", "route": "baseline", "latency_ms": 115.2, "input_tokens": 795, "output_tokens": 10},
+  {"text": "Why is my transfer still pending?", "ground_truth": "pending_transfer", "prediction": "pending_transfer", "route": "local", "latency_ms": 45.3, "input_tokens": 0, "output_tokens": 0},
+  {"text": "I need to change my PIN", "ground_truth": "change_pin", "prediction": "change_pin", "route": "local", "latency_ms": 42.1, "input_tokens": 0, "output_tokens": 0},
+  {"text": "Cancel my bank transfer please", "ground_truth": "cancel_transfer", "prediction": "cancel_transfer", "route": "baseline", "latency_ms": 130.8, "input_tokens": 810, "output_tokens": 9},
+  {"text": "What's the exchange rate today?", "ground_truth": "exchange_rate", "prediction": "exchange_rate", "route": "local", "latency_ms": 38.7, "input_tokens": 0, "output_tokens": 0},
+  {"text": "I want a refund for the charge", "ground_truth": "request_refund", "prediction": "request_refund", "route": "local", "latency_ms": 41.5, "input_tokens": 0, "output_tokens": 0},
+  {"text": "How do I top up my account?", "ground_truth": "topping_up_by_card", "prediction": "activate_my_card", "route": "local", "latency_ms": 55.2, "input_tokens": 0, "output_tokens": 0},
+  {"text": "My contactless isn't working", "ground_truth": "contactless_not_working", "prediction": "contactless_not_working", "route": "baseline", "latency_ms": 118.4, "input_tokens": 790, "output_tokens": 12},
+  {"text": "I need to verify my identity", "ground_truth": "verify_my_identity", "prediction": "verify_my_identity", "route": "local", "latency_ms": 39.8, "input_tokens": 0, "output_tokens": 0}
+]

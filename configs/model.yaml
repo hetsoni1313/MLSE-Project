@@ -1,0 +1,36 @@
+# Local Model Configuration
+model:
+  base_model: "QuantFactory/Meta-Llama-3-8B-Instruct-GGUF"
+  filename: "Meta-Llama-3-8B-Instruct.Q4_K_M.gguf"
+  quantization: "Q4_K_M"
+  context_size: 2048
+  n_threads: 4
+  n_gpu_layers: 0
+  use_mmap: true
+  use_mlock: false
+
+  server:
+    host: "127.0.0.1"
+    port: 8081
+    embedding: false
+    n_parallel: 1
+
+  inference:
+    temperature: 0.0
+    top_p: 1.0
+    top_k: 1
+    max_tokens: 50
+    repeat_penalty: 1.1
+    stop_tokens:
+      - "\n"
+      - "###"
+
+  prompt_template: |
+    <|begin_of_turn|>system
+    You are a banking intent classifier. Given a customer message, respond with ONLY the intent label from the Banking77 dataset. Do not explain.
+    <|end_of_turn|>
+    <|begin_of_turn|>user
+    Classify this banking customer message into one of the 77 intent categories.
+    Message: {message}
+    Intent:<|end_of_turn|>
+    <|begin_of_turn|>model

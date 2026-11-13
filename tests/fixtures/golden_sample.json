@@ -1,0 +1,26 @@
+{
+  "description": "Golden sample for regression testing — 20 Banking77 messages with known correct labels",
+  "version": "1.0",
+  "samples": [
+    {"text": "How do I get a new card?", "label": "get_physical_card"},
+    {"text": "My card was stolen yesterday", "label": "lost_or_stolen_card"},
+    {"text": "Why is my transfer still pending?", "label": "pending_transfer"},
+    {"text": "I need to change my PIN", "label": "change_pin"},
+    {"text": "Cancel my bank transfer please", "label": "cancel_transfer"},
+    {"text": "What's the exchange rate today?", "label": "exchange_rate"},
+    {"text": "I want a refund for the charge", "label": "request_refund"},
+    {"text": "How do I top up my account?", "label": "topping_up_by_card"},
+    {"text": "My contactless isn't working", "label": "contactless_not_working"},
+    {"text": "I need to verify my identity", "label": "verify_my_identity"},
+    {"text": "What are the ATM withdrawal limits?", "label": "atm_support"},
+    {"text": "Can I use Apple Pay with my card?", "label": "apple_pay_or_google_pay"},
+    {"text": "I see an extra charge on my statement", "label": "extra_charge_on_statement"},
+    {"text": "My card payment was declined", "label": "declined_card_payment"},
+    {"text": "How long does a card delivery take?", "label": "card_delivery_estimate"},
+    {"text": "I forgot my passcode", "label": "passcode_forgotten"},
+    {"text": "I want to terminate my account", "label": "terminate_account"},
+    {"text": "Can I get a virtual card?", "label": "getting_virtual_card"},
+    {"text": "My card is about to expire", "label": "card_about_to_expire"},
+    {"text": "I was charged twice for the same transaction", "label": "transaction_charged_twice"}
+  ]
+}

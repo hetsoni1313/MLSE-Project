@@ -1,0 +1,81 @@
+name: Model Promotion Gate
+
+on:
+  workflow_dispatch:
+    inputs:
+      predictions_path:
+        description: "Path to predictions JSON file"
+        required: false
+        default: "experiments/results/latest_predictions.json"
+      min_accuracy:
+        description: "Minimum accuracy threshold"
+        required: false
+        default: "0.80"
+      max_p95_latency:
+        description: "Maximum p95 latency (ms)"
+        required: false
+        default: "5000"
+      max_invalid_rate:
+        description: "Maximum invalid output rate"
+        required: false
+        default: "0.10"
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Run model promotion evaluation
+        run: |
+          python -c "
+          import json, sys
+          from pathlib import Path
+          from evaluation.comparison import ModelComparison
+          from evaluation.evaluate import Evaluator
+
+          pred_path = '${{ github.event.inputs.predictions_path }}'
+          min_acc = float('${{ github.event.inputs.min_accuracy }}')
+          max_lat = float('${{ github.event.inputs.max_p95_latency }}')
+          max_inv = float('${{ github.event.inputs.max_invalid_rate }}')
+
+          # Try loading real predictions
+          if Path(pred_path).exists():
+              evaluator = Evaluator('candidate-model')
+              result = evaluator.evaluate_from_file(pred_path)
+              comparison = ModelComparison(min_acc, max_lat, max_inv)
+              gate = comparison.check_promotion(result)
+              print(json.dumps(gate, indent=2))
+              if not gate['promoted']:
+                  print('❌ Model REJECTED')
+                  sys.exit(1)
+              print('✅ Model PROMOTED')
+          else:
+              # Run with test fixtures to validate gate logic
+              print('⚠️  No prediction file found. Running gate logic test...')
+              comparison = ModelComparison(min_acc, max_lat, max_inv)
+
+              # Test passing scenario
+              from src.llmops_governance.schemas.metrics import EvaluationResult
+              passing = EvaluationResult(model_name='test-pass', accuracy=0.90, p95_latency_ms=2000, invalid_rate=0.02, total_requests=100)
+              gate = comparison.check_promotion(passing)
+              assert gate['promoted'], 'Passing model should be promoted'
+
+              # Test failing scenario
+              failing = EvaluationResult(model_name='test-fail', accuracy=0.50, p95_latency_ms=8000, invalid_rate=0.20, total_requests=100)
+              gate = comparison.check_promotion(failing)
+              assert not gate['promoted'], 'Failing model should be rejected'
+
+              print('✅ Gate logic validated (pass/fail scenarios)')
+          "
+

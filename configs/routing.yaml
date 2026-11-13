@@ -1,0 +1,39 @@
+# Routing Configuration for A/B and Canary Deployment
+routing:
+  mode: "baseline"  # baseline | ab_test | canary | shadow
+
+  baseline:
+    route: "cloud"  # cloud | local
+    percentage: 100
+
+  ab_test:
+    cloud_percentage: 50
+    local_percentage: 50
+    sticky_routing: true
+    hash_seed: 42
+
+  shadow:
+    primary: "cloud"
+    shadow: "local"
+    shadow_percentage: 100
+
+  canary:
+    stages:
+      - name: "canary_5"
+        local_percentage: 5
+        duration_minutes: 30
+        min_requests: 100
+      - name: "canary_25"
+        local_percentage: 25
+        duration_minutes: 60
+        min_requests: 500
+      - name: "canary_50"
+        local_percentage: 50
+        duration_minutes: 120
+        min_requests: 1000
+      - name: "canary_100"
+        local_percentage: 100
+        duration_minutes: 0
+        min_requests: 0
+    auto_rollback: true
+    rollback_on_error_rate: 0.05

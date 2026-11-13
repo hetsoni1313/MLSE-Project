@@ -1,0 +1,21 @@
+# Rollback & Quality Thresholds
+thresholds:
+  rollback:
+    min_accuracy: 0.75
+    max_error_rate: 0.05
+    max_p95_latency_ms: 5000
+    evaluation_window: 300  # seconds
+    min_labelled_samples: 50
+
+  alerts:
+    accuracy_warning: 0.80
+    accuracy_critical: 0.70
+    latency_warning_ms: 3000
+    latency_critical_ms: 8000
+    error_rate_warning: 0.03
+    error_rate_critical: 0.08
+
+  cost:
+    max_daily_cost_usd: 50.0
+    max_per_request_cost_usd: 0.10
+    budget_alert_percentage: 80

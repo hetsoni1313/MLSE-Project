@@ -1,0 +1,25 @@
+# API Pricing Configuration
+# All prices in USD per token
+pricing:
+  currency: "USD"
+  effective_date: "2024-01-15"
+
+  models:
+    gpt-4o-mini:
+      provider: "openai"
+      input_price_per_1k_tokens: 0.000150
+      output_price_per_1k_tokens: 0.000600
+      max_context_tokens: 128000
+
+    gemini-1.5-flash:
+      provider: "google"
+      input_price_per_1k_tokens: 0.000075
+      output_price_per_1k_tokens: 0.000300
+      max_context_tokens: 1048576
+
+    local-llama-3-8b:
+      provider: "local"
+      input_price_per_1k_tokens: 0.0
+      output_price_per_1k_tokens: 0.0
+      fixed_cost_per_hour: 0.0  # Already paid for hardware
+      max_context_tokens: 2048

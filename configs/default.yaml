@@ -1,0 +1,50 @@
+# LLMOps Cost & Latency Governance Platform - Default Configuration
+app:
+  name: "llmops-governance"
+  version: "0.1.0"
+  environment: "development"
+  debug: false
+
+gateway:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 1
+  cors_origins:
+    - "http://localhost:8501"
+    - "http://localhost:3000"
+  request_timeout_ms: 30000
+  max_concurrent_requests: 4
+
+database:
+  url: "sqlite+aiosqlite:///./data/llmops.db"
+  echo: false
+  pool_size: 5
+  max_overflow: 10
+  pool_timeout: 30
+
+logging:
+  level: "INFO"
+  format: "json"
+  log_file: null
+  redact_keys:
+    - "api_key"
+    - "authorization"
+
+models:
+  local:
+    name: "QuantFactory/Meta-Llama-3-8B-Instruct-GGUF"
+    quantization: "Q4_K_M"
+    context_size: 2048
+    n_threads: 4
+    server_host: "127.0.0.1"
+    server_port: 8081
+    timeout_ms: 10000
+  cloud:
+    openai:
+      model: "gpt-4o-mini"
+      max_tokens: 50
+      temperature: 0.0
+    gemini:
+      model: "gemini-1.5-flash"
+      max_tokens: 50
+      temperature: 0.0

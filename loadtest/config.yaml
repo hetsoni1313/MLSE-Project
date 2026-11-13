@@ -1,0 +1,72 @@
+# Load Test Configuration
+# Configure traffic replay scenarios and parameters
+
+default:
+  gateway_url: "http://localhost:8000"
+  endpoint: "/classify"
+  timeout_seconds: 30
+  warmup_requests: 5
+  cooldown_seconds: 2
+
+scenarios:
+  smoke:
+    description: "Quick smoke test — 10 requests"
+    num_requests: 10
+    concurrency: 1
+    delay_ms: 100
+
+  baseline_only:
+    description: "All traffic to baseline (no local model needed)"
+    num_requests: 100
+    concurrency: 2
+    delay_ms: 50
+    routing_mode: "baseline"
+
+  weighted_50_50:
+    description: "50/50 weighted split between baseline and local"
+    num_requests: 200
+    concurrency: 4
+    delay_ms: 25
+    routing_mode: "weighted"
+    baseline_percentage: 50
+    local_percentage: 50
+
+  shadow:
+    description: "Shadow mode — baseline serves, local runs silently"
+    num_requests: 100
+    concurrency: 2
+    delay_ms: 50
+    routing_mode: "shadow"
+
+  canary_rollout:
+    description: "Canary stages: 5% → 25% → 50% → 100%"
+    num_requests: 400
+    concurrency: 4
+    delay_ms: 25
+    routing_mode: "canary"
+    stages: [5, 25, 50, 100]
+    requests_per_stage: 100
+
+  stress:
+    description: "Stress test — high concurrency"
+    num_requests: 500
+    concurrency: 8
+    delay_ms: 10
+    routing_mode: "weighted"
+    baseline_percentage: 50
+    local_percentage: 50
+
+  endurance:
+    description: "Extended run for stability testing"
+    num_requests: 1000
+    concurrency: 2
+    delay_ms: 100
+    routing_mode: "weighted"
+    baseline_percentage: 70
+    local_percentage: 30
+
+reporting:
+  output_dir: "loadtest/results"
+  save_raw_results: true
+  save_summary: true
+  percentiles: [50, 90, 95, 99]

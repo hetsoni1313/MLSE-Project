@@ -1,0 +1,39 @@
+# Structured Logging Configuration
+logging:
+  version: 1
+  disable_existing_loggers: false
+
+  processors:
+    - structlog.contextvars.merge_contextvars
+    - structlog.processors.add_log_level
+    - structlog.processors.StackInfoRenderer
+    - structlog.dev.set_exc_info
+    - structlog.processors.TimeStamper(fmt="iso")
+    - structlog.processors.JSONRenderer
+
+  handlers:
+    console:
+      level: "INFO"
+      format: "json"
+    file:
+      level: "DEBUG"
+      path: "logs/llmops.log"
+      max_bytes: 10485760  # 10MB
+      backup_count: 5
+
+  loggers:
+    llmops_governance:
+      level: "INFO"
+    uvicorn:
+      level: "WARNING"
+    sqlalchemy:
+      level: "WARNING"
+    httpx:
+      level: "WARNING"
+
+  redact_keys:
+    - "api_key"
+    - "authorization"
+    - "password"
+    - "secret"
+    - "token"
