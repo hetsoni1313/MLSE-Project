@@ -147,3 +147,4 @@ Uses configurable `PricingAssumptions` — never hardcoded values.
 | PostgreSQL | ~200 MB | Or SQLite for dev |
 | Streamlit Dashboard | ~150 MB | Single tab |
 | **Total** | **~3-4 GB** | Leaves 12+ GB for OS |
+

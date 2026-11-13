@@ -70,3 +70,4 @@ reporting:
   save_raw_results: true
   save_summary: true
   percentiles: [50, 90, 95, 99]
+

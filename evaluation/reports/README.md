@@ -21,3 +21,4 @@ python -m evaluation.cost --output evaluation/reports/
 ```
 
 Reports are **not committed to Git** — they are generated per-run and may contain environment-specific data.
+
