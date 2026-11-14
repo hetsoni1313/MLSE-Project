@@ -66,9 +66,10 @@ async def set_fault(
     """Toggle fault injection."""
     async with httpx.AsyncClient(timeout=10) as client:
         try:
-            body: dict = {"action": "enable" if enabled else "disable"}
-            if enabled:
-                body = {"action": "set", "fault_type": fault_type, "enabled": True}
+            if not fault_type:
+                body: dict = {"action": "enable" if enabled else "disable"}
+            else:
+                body = {"action": "set", "fault_type": fault_type, "enabled": enabled}
             response = await client.post(
                 f"{gateway_url}/admin/faults",
                 headers={"X-API-Key": admin_key},

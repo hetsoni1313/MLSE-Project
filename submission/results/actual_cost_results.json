@@ -1,0 +1,49 @@
+{
+  "assumptions": {
+    "api_input_price_per_mtok": 0.15,
+    "api_output_price_per_mtok": 0.6,
+    "api_avg_input_tokens": 800.0,
+    "api_avg_output_tokens": 10.0,
+    "local_queries_per_hour": 200.0,
+    "training_cost": 0.0,
+    "currency": "USD"
+  },
+  "per_query": {
+    "api": 0.000126,
+    "local_low": 0.00025,
+    "local_base": 0.00125,
+    "local_high": 0.005
+  },
+  "per_1k": {
+    "api": 0.126,
+    "local_low": 0.25,
+    "local_base": 1.25,
+    "local_high": 5.0
+  },
+  "sensitivity": {
+    "low": {
+      "api_cost_per_query": 0.000126,
+      "api_cost_per_1k": 0.126,
+      "local_cost_per_query": 0.00025,
+      "local_cost_per_1k": 0.25,
+      "break_even_monthly_queries": 285714.2857142858,
+      "savings_at_10k_monthly": -1.24
+    },
+    "base": {
+      "api_cost_per_query": 0.000126,
+      "api_cost_per_1k": 0.126,
+      "local_cost_per_query": 0.00125,
+      "local_cost_per_1k": 1.25,
+      "break_even_monthly_queries": 1428571.4285714286,
+      "savings_at_10k_monthly": -11.24
+    },
+    "high": {
+      "api_cost_per_query": 0.000126,
+      "api_cost_per_1k": 0.126,
+      "local_cost_per_query": 0.005,
+      "local_cost_per_1k": 5.0,
+      "break_even_monthly_queries": 5714285.714285715,
+      "savings_at_10k_monthly": -48.74
+    }
+  }
+}

@@ -1,0 +1,194 @@
+/Users/hetkatrodiya/Desktop/SEM-3/Machine Learning System Engneering/Project/MLSE-Project/venv/lib/python3.13/site-packages/pytest_asyncio/plugin.py:306: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to "function" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session". Set it to "fixture-scope" to keep the current behavior.
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+============================= test session starts ==============================
+platform darwin -- Python 3.13.5, pytest-9.2.0, pluggy-1.7.0 -- /Users/hetkatrodiya/Desktop/SEM-3/Machine Learning System Engneering/Project/MLSE-Project/venv/bin/python3.13
+cachedir: .pytest_cache
+rootdir: /Users/hetkatrodiya/Desktop/SEM-3/Machine Learning System Engneering/Project/MLSE-Project
+configfile: pyproject.toml
+plugins: platformdirs-4.14.5, cov-7.1.0, anyio-4.16.0, asyncio-1.5.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 124 items
+
+tests/evaluation/test_evaluate.py::TestEvaluator::test_evaluate_predictions_perfect PASSED [  0%]
+tests/evaluation/test_evaluate.py::TestEvaluator::test_evaluate_from_file PASSED [  1%]
+tests/evaluation/test_evaluate.py::TestEvaluator::test_save_report PASSED [  2%]
+tests/evaluation/test_evaluate.py::TestEvaluator::test_compare_models PASSED [  3%]
+tests/evaluation/test_evaluate.py::TestModelComparison::test_promotion_pass PASSED [  4%]
+tests/evaluation/test_evaluate.py::TestModelComparison::test_promotion_fail_accuracy PASSED [  4%]
+tests/evaluation/test_evaluate.py::TestModelComparison::test_compare_side_by_side PASSED [  5%]
+tests/evaluation/test_evaluate.py::TestPredictionRunner::test_run_dataset PASSED [  6%]
+tests/integration/test_fault_injection.py::TestFaultInjectionBackendUnit::test_unavailable_fault PASSED [  7%]
+tests/integration/test_fault_injection.py::TestFaultInjectionBackendUnit::test_invalid_output_fault PASSED [  8%]
+tests/integration/test_fault_injection.py::TestFaultInjectionBackendUnit::test_degraded_accuracy_fault PASSED [  8%]
+tests/integration/test_fault_injection.py::TestFaultInjectionBackendUnit::test_error_rate_fault PASSED [  9%]
+tests/integration/test_fault_injection.py::TestFaultInjectionBackendUnit::test_disabled_does_not_modify_behavior PASSED [ 10%]
+tests/integration/test_fault_injection.py::TestFaultGatewayIntegration::test_fault_endpoints_authorization PASSED [ 11%]
+tests/integration/test_fault_injection.py::TestFaultGatewayIntegration::test_local_server_unavailable_triggers_fallback PASSED [ 12%]
+tests/integration/test_fault_injection.py::TestFaultGatewayIntegration::test_manual_rollback_trigger_and_recovery PASSED [ 12%]
+tests/integration/test_gateway.py::TestHealthEndpoints::test_health PASSED [ 13%]
+tests/integration/test_gateway.py::TestHealthEndpoints::test_ready PASSED [ 14%]
+tests/integration/test_gateway.py::TestClassifyEndpoint::test_classify_basic PASSED [ 15%]
+tests/integration/test_gateway.py::TestClassifyEndpoint::test_classify_with_ground_truth PASSED [ 16%]
+tests/integration/test_gateway.py::TestClassifyEndpoint::test_classify_empty_message_rejected PASSED [ 16%]
+tests/integration/test_gateway.py::TestAdminEndpoints::test_get_config_without_key PASSED [ 17%]
+tests/integration/test_gateway.py::TestAdminEndpoints::test_get_config_with_key PASSED [ 18%]
+tests/integration/test_gateway.py::TestAdminEndpoints::test_update_config PASSED [ 19%]
+tests/integration/test_gateway.py::TestMetricsEndpoint::test_metrics PASSED [ 20%]
+tests/resilience/test_circuit_breaker.py::TestCircuitBreaker::test_initial_state_closed PASSED [ 20%]
+tests/resilience/test_circuit_breaker.py::TestCircuitBreaker::test_allows_request_when_closed PASSED [ 21%]
+tests/resilience/test_circuit_breaker.py::TestCircuitBreaker::test_opens_after_threshold_failures PASSED [ 22%]
+tests/resilience/test_circuit_breaker.py::TestCircuitBreaker::test_rejects_when_open PASSED [ 23%]
+tests/resilience/test_circuit_breaker.py::TestCircuitBreaker::test_success_decrements_failures PASSED [ 24%]
+tests/resilience/test_circuit_breaker.py::TestCircuitBreaker::test_reset_clears_state PASSED [ 25%]
+tests/resilience/test_fallback.py::TestFallbackHandler::test_local_success_no_fallback PASSED [ 25%]
+tests/resilience/test_fallback.py::TestFallbackHandler::test_local_error_triggers_fallback PASSED [ 26%]
+tests/resilience/test_fallback.py::TestFallbackHandler::test_local_invalid_triggers_fallback PASSED [ 27%]
+tests/resilience/test_fallback.py::TestFallbackHandler::test_fallback_count_increments PASSED [ 28%]
+tests/resilience/test_fallback.py::TestFallbackHandler::test_shadow_returns_baseline PASSED [ 29%]
+tests/resilience/test_fallback.py::TestFallbackHandler::test_shadow_local_failure_doesnt_affect_baseline PASSED [ 29%]
+tests/resilience/test_rollback.py::TestRollbackMonitor::test_initial_state PASSED [ 30%]
+tests/resilience/test_rollback.py::TestRollbackMonitor::test_rollback_sets_baseline PASSED [ 31%]
+tests/resilience/test_rollback.py::TestRollbackMonitor::test_rollback_prevents_duplicate PASSED [ 32%]
+tests/resilience/test_rollback.py::TestRollbackMonitor::test_recovery_clears_rollback PASSED [ 33%]
+tests/resilience/test_rollback.py::TestRollbackMonitor::test_skip_when_zero_local PASSED [ 33%]
+tests/resilience/test_rollback.py::TestRollbackMonitor::test_thresholds_configurable PASSED [ 34%]
+tests/resilience/test_rollback.py::TestRollbackMonitor::test_evaluate_triggers_accuracy_rollback PASSED [ 35%]
+tests/resilience/test_rollback.py::TestRollbackMonitor::test_evaluate_accuracy_skips_when_samples_insufficient PASSED [ 36%]
+tests/resilience/test_rollback.py::TestRollbackMonitor::test_evaluate_triggers_error_rate_rollback PASSED [ 37%]
+tests/resilience/test_rollback.py::TestRollbackMonitor::test_evaluate_triggers_latency_rollback PASSED [ 37%]
+tests/routing/test_canary.py::TestCanaryDeployment::test_advance_canary_stages PASSED [ 38%]
+tests/routing/test_canary.py::TestCanaryDeployment::test_canary_at_final_stage PASSED [ 39%]
+tests/routing/test_config.py::TestRoutingConfig::test_valid_baseline PASSED [ 40%]
+tests/routing/test_config.py::TestRoutingConfig::test_valid_weighted PASSED [ 41%]
+tests/routing/test_config.py::TestRoutingConfig::test_invalid_sum PASSED [ 41%]
+tests/routing/test_config.py::TestRoutingConfig::test_negative_percentage PASSED [ 42%]
+tests/routing/test_config.py::TestRoutingConfig::test_invalid_mode PASSED [ 43%]
+tests/routing/test_config.py::TestRoutingConfig::test_to_baseline_only PASSED [ 44%]
+tests/routing/test_shadow.py::TestShadowMode::test_shadow_mode_returns_shadow_route PASSED [ 45%]
+tests/routing/test_shadow.py::TestShadowMode::test_shadow_enabled_flag PASSED [ 45%]
+tests/routing/test_shadow.py::TestShadowMode::test_shadow_disabled PASSED [ 46%]
+tests/routing/test_sticky.py::TestStickyRouting::test_same_user_same_route PASSED [ 47%]
+tests/routing/test_sticky.py::TestStickyRouting::test_different_users_distributed PASSED [ 48%]
+tests/routing/test_sticky.py::TestStickyRouting::test_request_id_fallback PASSED [ 49%]
+tests/routing/test_sticky.py::TestStickyRouting::test_stable_across_calls PASSED [ 50%]
+tests/routing/test_weighted.py::TestWeightedRouting::test_100_baseline PASSED [ 50%]
+tests/routing/test_weighted.py::TestWeightedRouting::test_100_local PASSED [ 51%]
+tests/routing/test_weighted.py::TestWeightedRouting::test_50_50_distribution PASSED [ 52%]
+tests/routing/test_weighted.py::TestWeightedRouting::test_90_10_distribution PASSED [ 53%]
+tests/unit/test_cost.py::TestCostCalculator::test_api_query_cost PASSED  [ 54%]
+tests/unit/test_cost.py::TestCostCalculator::test_local_query_cost PASSED [ 54%]
+tests/unit/test_cost.py::TestCostCalculator::test_cost_per_1k PASSED     [ 55%]
+tests/unit/test_cost.py::TestCostCalculator::test_break_even_returns_value PASSED [ 56%]
+tests/unit/test_cost.py::TestCostCalculator::test_sensitivity_has_three_scenarios PASSED [ 57%]
+tests/unit/test_cost.py::TestCostCalculator::test_report_structure PASSED [ 58%]
+tests/unit/test_exceptions.py::TestExceptions::test_base_exception PASSED [ 58%]
+tests/unit/test_exceptions.py::TestExceptions::test_backend_error PASSED [ 59%]
+tests/unit/test_exceptions.py::TestExceptions::test_backend_timeout_error PASSED [ 60%]
+tests/unit/test_exceptions.py::TestExceptions::test_invalid_prediction_error PASSED [ 61%]
+tests/unit/test_exceptions.py::TestExceptions::test_rollback_triggered_error PASSED [ 62%]
+tests/unit/test_exceptions.py::TestExceptions::test_configuration_error PASSED [ 62%]
+tests/unit/test_exceptions.py::TestExceptions::test_model_not_available_error PASSED [ 63%]
+tests/unit/test_hashing.py::TestStickyHash::test_deterministic PASSED    [ 64%]
+tests/unit/test_hashing.py::TestStickyHash::test_different_users_different_buckets PASSED [ 65%]
+tests/unit/test_hashing.py::TestStickyHash::test_range_valid PASSED      [ 66%]
+tests/unit/test_hashing.py::TestStickyHash::test_different_bucket_sizes PASSED [ 66%]
+tests/unit/test_hashing.py::TestFileHash::test_hash_file PASSED          [ 67%]
+tests/unit/test_hashing.py::TestFileHash::test_same_content_same_hash PASSED [ 68%]
+tests/unit/test_hashing.py::TestFileHash::test_different_content_different_hash PASSED [ 69%]
+tests/unit/test_metrics.py::TestAccuracy::test_perfect_accuracy PASSED   [ 70%]
+tests/unit/test_metrics.py::TestAccuracy::test_zero_accuracy PASSED      [ 70%]
+tests/unit/test_metrics.py::TestAccuracy::test_partial_accuracy PASSED   [ 71%]
+tests/unit/test_metrics.py::TestAccuracy::test_empty_input PASSED        [ 72%]
+tests/unit/test_metrics.py::TestMacroF1::test_perfect_f1 PASSED          [ 73%]
+tests/unit/test_metrics.py::TestMacroF1::test_zero_f1 PASSED             [ 74%]
+tests/unit/test_metrics.py::TestMacroF1::test_partial_f1 PASSED          [ 75%]
+tests/unit/test_metrics.py::TestInvalidRate::test_all_valid PASSED       [ 75%]
+tests/unit/test_metrics.py::TestInvalidRate::test_all_invalid PASSED     [ 76%]
+tests/unit/test_metrics.py::TestInvalidRate::test_mixed PASSED           [ 77%]
+tests/unit/test_metrics.py::TestLatencyStats::test_basic_stats PASSED    [ 78%]
+tests/unit/test_metrics.py::TestLatencyStats::test_empty_latencies PASSED [ 79%]
+tests/unit/test_metrics.py::TestLatencyStats::test_single_latency PASSED [ 79%]
+tests/unit/test_metrics.py::TestPerClassAccuracy::test_per_class PASSED  [ 80%]
+tests/unit/test_metrics.py::TestErrorRate::test_no_errors PASSED         [ 81%]
+tests/unit/test_metrics.py::TestErrorRate::test_all_errors PASSED        [ 82%]
+tests/unit/test_metrics.py::TestErrorRate::test_mixed PASSED             [ 83%]
+tests/unit/test_repository.py::TestRepositories::test_request_log_crud PASSED [ 83%]
+tests/unit/test_repository.py::TestRepositories::test_experiment_crud PASSED [ 84%]
+tests/unit/test_repository.py::TestRepositories::test_rollback_crud PASSED [ 85%]
+tests/unit/test_repository.py::TestRepositories::test_routing_config_crud PASSED [ 86%]
+tests/unit/test_repository.py::TestRepositories::test_evaluation_summary_crud PASSED [ 87%]
+tests/unit/test_validation.py::TestNormalizeLabel::test_already_normalized PASSED [ 87%]
+tests/unit/test_validation.py::TestNormalizeLabel::test_uppercase PASSED [ 88%]
+tests/unit/test_validation.py::TestNormalizeLabel::test_mixed_case PASSED [ 89%]
+tests/unit/test_validation.py::TestNormalizeLabel::test_whitespace PASSED [ 90%]
+tests/unit/test_validation.py::TestNormalizeLabel::test_hyphens_to_underscores PASSED [ 91%]
+tests/unit/test_validation.py::TestNormalizeLabel::test_spaces_to_underscores PASSED [ 91%]
+tests/unit/test_validation.py::TestNormalizeLabel::test_quoted_label PASSED [ 92%]
+tests/unit/test_validation.py::TestNormalizeLabel::test_prefix_stripped PASSED [ 93%]
+tests/unit/test_validation.py::TestNormalizeLabel::test_numbered_prefix PASSED [ 94%]
+tests/unit/test_validation.py::TestValidateLabel::test_valid_label PASSED [ 95%]
+tests/unit/test_validation.py::TestValidateLabel::test_invalid_label PASSED [ 95%]
+tests/unit/test_validation.py::TestValidateLabel::test_empty_label PASSED [ 96%]
+tests/unit/test_validation.py::TestValidateLabel::test_all_77_labels_are_valid PASSED [ 97%]
+tests/unit/test_validation.py::TestValidateLabel::test_label_set_has_77_entries PASSED [ 98%]
+tests/unit/test_validation.py::TestExtractLabel::test_clean_label PASSED [ 99%]
+tests/unit/test_validation.py::TestExtractLabel::test_with_explanation PASSED [100%]
+
+================================ tests coverage ================================
+_______________ coverage: platform darwin, python 3.13.5-final-0 _______________
+
+Name                                          Stmts   Miss  Cover   Missing
+---------------------------------------------------------------------------
+evaluation/__init__.py                            0      0   100%
+evaluation/comparison.py                         13      0   100%
+evaluation/cost.py                               48      1    98%   74
+evaluation/evaluate.py                           46      2    96%   32-33
+evaluation/metrics.py                            57      7    88%   25, 46, 98-101, 107
+evaluation/predictions.py                        38      8    79%   90-92, 111-121
+gateway/__init__.py                               0      0   100%
+gateway/api/__init__.py                           0      0   100%
+gateway/api/admin.py                             94     19    80%   51-52, 71-72, 102-117, 132, 148-160, 175, 182-183, 191
+gateway/api/classify.py                          60     13    78%   47-53, 67-70, 120, 161-166
+gateway/api/health.py                            33      7    79%   37-38, 44-45, 51-52, 56
+gateway/api/metrics_api.py                        8      0   100%
+gateway/backends/__init__.py                     23      0   100%
+gateway/backends/baseline.py                     94     57    39%   38-45, 58-62, 66, 69-78, 82-142, 151-158, 162-164, 194
+gateway/backends/fault_injection.py              95     13    86%   63, 67, 72-73, 86, 115-117, 136-137, 145-146, 173
+gateway/backends/local.py                        72     36    50%   28-33, 66-128, 140
+gateway/main.py                                  84      4    95%   59, 78-79, 132
+gateway/middleware/__init__.py                    0      0   100%
+gateway/middleware/auth.py                       12      0   100%
+gateway/resilience/__init__.py                    0      0   100%
+gateway/resilience/circuit_breaker.py            57      8    86%   49-50, 59, 66-69, 79
+gateway/resilience/fallback.py                   36      3    92%   85-87
+gateway/resilience/rollback.py                   91     10    89%   68, 80-81, 89, 92-93, 162, 171-188
+gateway/routing/__init__.py                       0      0   100%
+gateway/routing/config.py                        19      0   100%
+gateway/routing/engine.py                        77      0   100%
+gateway/services/__init__.py                     58     13    78%   40-41, 49-50, 59, 68, 71-72, 81-85
+src/llmops_governance/__init__.py                 1      0   100%
+src/llmops_governance/config/__init__.py          2      0   100%
+src/llmops_governance/config/settings.py         99      4    96%   27, 57-58, 143
+src/llmops_governance/core/__init__.py            0      0   100%
+src/llmops_governance/core/constants.py          15      0   100%
+src/llmops_governance/core/exceptions.py         30      0   100%
+src/llmops_governance/logging/__init__.py         2      0   100%
+src/llmops_governance/logging/setup.py           44      4    91%   69, 112-119
+src/llmops_governance/metrics/__init__.py         2      0   100%
+src/llmops_governance/metrics/collector.py       73     12    84%   65, 75, 109-117, 123
+src/llmops_governance/metrics/database.py        59     12    80%   49, 71, 85, 93-94, 98, 108-110, 116-118
+src/llmops_governance/metrics/models.py          91      0   100%
+src/llmops_governance/metrics/repository.py     122     38    69%   76-79, 85-97, 107-119, 131-149, 184, 221-224, 251-254
+src/llmops_governance/schemas/__init__.py         3      0   100%
+src/llmops_governance/schemas/metrics.py         81      0   100%
+src/llmops_governance/schemas/requests.py        37      0   100%
+src/llmops_governance/utils/__init__.py           4      0   100%
+src/llmops_governance/utils/hashing.py           32      8    75%   23, 25, 46, 61-65
+src/llmops_governance/utils/timing.py            62     37    40%   41-42, 47-49, 57, 68-69, 85-86, 89-91, 99, 104-105, 127-143, 163-175
+src/llmops_governance/utils/validation.py        48     11    77%   129-142, 173-178
+---------------------------------------------------------------------------
+TOTAL                                          1922    327    83%
+Required test coverage of 80.0% reached. Total coverage: 82.99%
+============================= 124 passed in 0.84s ==============================

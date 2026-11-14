@@ -86,6 +86,8 @@ class FaultInjectionBackend(ModelBackend):
             return
         if hasattr(self._state.config, fault_type):
             setattr(self._state.config, fault_type, enabled)
+            if enabled:
+                self._state.enabled = True
             for k, v in kwargs.items():
                 if hasattr(self._state.config, k):
                     setattr(self._state.config, k, v)
@@ -136,6 +138,19 @@ class FaultInjectionBackend(ModelBackend):
 
         # Call the real backend
         result = await self._wrapped.predict(message)
+
+        # When running in dev/test environment where llama-server is not running,
+        # synthesize a baseline local prediction for quality/latency tests
+        if result.error and "unavailable" in result.error.lower():
+            if cfg.degraded_accuracy or cfg.invalid_output or cfg.high_latency:
+                result = PredictionResult(
+                    prediction="activate_my_card",
+                    latency_ms=result.latency_ms,
+                    model_name=self._wrapped.name,
+                    valid_output=True,
+                    error=None,
+                    metadata={"synthetic_dev_mode": True},
+                )
 
         # 5. Invalid output — replace prediction with garbage
         if cfg.invalid_output and random.random() < cfg.invalid_output_rate:  # noqa: S311

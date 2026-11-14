@@ -71,6 +71,10 @@ class RequestLogger:
             except Exception as e:
                 logger.error("request_logger_error", error=str(e))
 
+    async def flush(self) -> None:
+        """Flush all pending items in the queue to DB."""
+        await self._flush_queue()
+
     async def _flush_queue(self) -> None:
         """Flush all remaining items in the queue."""
         while not self._queue.empty():

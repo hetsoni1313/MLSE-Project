@@ -1,0 +1,100 @@
+{
+  "100_baseline": {
+    "total_requests": 50,
+    "duration_seconds": 0.045,
+    "throughput_qps": 1111.8,
+    "accuracy": 0.04,
+    "fallbacks": 0,
+    "errors": 0,
+    "mean_latency_ms": 0.89,
+    "p50_latency_ms": 0.86,
+    "p95_latency_ms": 1.17,
+    "route_distribution": {
+      "baseline": 50
+    }
+  },
+  "shadow_mode": {
+    "total_requests": 50,
+    "duration_seconds": 0.102,
+    "throughput_qps": 487.93,
+    "accuracy": 0.04,
+    "fallbacks": 0,
+    "errors": 0,
+    "mean_latency_ms": 2.04,
+    "p50_latency_ms": 1.53,
+    "p95_latency_ms": 1.95,
+    "route_distribution": {
+      "baseline": 50
+    }
+  },
+  "canary_90_10": {
+    "total_requests": 50,
+    "duration_seconds": 0.05,
+    "throughput_qps": 999.15,
+    "accuracy": 0.04,
+    "fallbacks": 10,
+    "errors": 0,
+    "mean_latency_ms": 1.0,
+    "p50_latency_ms": 0.86,
+    "p95_latency_ms": 1.63,
+    "route_distribution": {
+      "baseline": 50
+    }
+  },
+  "split_50_50": {
+    "total_requests": 50,
+    "duration_seconds": 0.059,
+    "throughput_qps": 842.26,
+    "accuracy": 0.04,
+    "fallbacks": 22,
+    "errors": 0,
+    "mean_latency_ms": 1.18,
+    "p50_latency_ms": 0.91,
+    "p95_latency_ms": 1.79,
+    "route_distribution": {
+      "baseline": 50
+    }
+  },
+  "full_local_100": {
+    "total_requests": 50,
+    "duration_seconds": 0.079,
+    "throughput_qps": 630.79,
+    "accuracy": 0.04,
+    "fallbacks": 50,
+    "errors": 0,
+    "mean_latency_ms": 1.58,
+    "p50_latency_ms": 1.54,
+    "p95_latency_ms": 1.84,
+    "route_distribution": {
+      "baseline": 50
+    }
+  },
+  "local_failure_fallback": {
+    "total_requests": 50,
+    "duration_seconds": 0.044,
+    "throughput_qps": 1133.2,
+    "accuracy": 0.04,
+    "fallbacks": 50,
+    "errors": 0,
+    "mean_latency_ms": 0.88,
+    "p50_latency_ms": 0.88,
+    "p95_latency_ms": 1.11,
+    "route_distribution": {
+      "baseline": 50
+    }
+  },
+  "degraded_accuracy_test": {
+    "total_requests": 50,
+    "duration_seconds": 0.09,
+    "throughput_qps": 552.7,
+    "accuracy": 0.04,
+    "fallbacks": 0,
+    "errors": 0,
+    "mean_latency_ms": 1.8,
+    "p50_latency_ms": 1.5,
+    "p95_latency_ms": 1.87,
+    "route_distribution": {
+      "local": 50
+    }
+  }
+}

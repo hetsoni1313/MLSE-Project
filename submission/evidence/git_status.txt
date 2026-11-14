@@ -1,0 +1,28 @@
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   docs/agent_progress.md
+	modified:   evaluation/cost.py
+	modified:   gateway/api/admin.py
+	modified:   gateway/backends/fault_injection.py
+	modified:   gateway/services/__init__.py
+	modified:   loadtest/replay.py
+	modified:   tests/resilience/test_rollback.py
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	docs/failure_injection_and_rollback.md
+	docs/final_audit.md
+	scripts/run_benchmarks_and_loadtest.py
+	scripts/run_failure_demo.py
+	scripts/run_failure_demo.sh
+	submission/
+	tests/evaluation/test_evaluate.py
+	tests/integration/test_fault_injection.py
+	tests/unit/test_exceptions.py
+	tests/unit/test_repository.py
+
+no changes added to commit (use "git add" and/or "git commit -a")

@@ -1,0 +1,45 @@
+{
+  "timestamp": "2026-11-14T06:32:58Z",
+  "scenarios": {
+    "scenario_1_baseline": {
+      "status": "PASSED",
+      "route": "baseline",
+      "prediction": "request_refund",
+      "fallback_used": false
+    },
+    "scenario_2_shadow": {
+      "status": "PASSED",
+      "route": "baseline",
+      "shadow_prediction": ""
+    },
+    "scenario_3_canary": {
+      "status": "PASSED",
+      "canary_stages": [
+        "10%",
+        "50%"
+      ]
+    },
+    "scenario_4_fallback": {
+      "status": "PASSED",
+      "requests_sent": 5,
+      "fallbacks_triggered": 5,
+      "client_error_count": 0,
+      "availability": 1.0
+    },
+    "scenario_5_rollback": {
+      "status": "PASSED",
+      "trigger_type": "accuracy",
+      "metric_value": 0.02857142857142857,
+      "threshold_value": 0.85,
+      "post_rollback_local_pct": 0,
+      "post_rollback_baseline_pct": 100,
+      "audit_event_id": "6cc566ad-2ccc-4e40-8f28-4468346d32f3"
+    },
+    "scenario_6_recovery": {
+      "status": "PASSED",
+      "recovered_local_pct": 10,
+      "recovered_baseline_pct": 90,
+      "is_rolled_back": false
+    }
+  }
+}

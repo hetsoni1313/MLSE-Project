@@ -1,0 +1,102 @@
+{
+  "evaluation_dataset": "PolyAI/banking77 golden test split",
+  "dataset_hash": "f1cce3e0217ec2105e2018f2c9e9160b9fcbb2bc14dd016fc25e53a7189b743b",
+  "sample_count": 50,
+  "timestamp": "2026-11-14T06:35:57Z",
+  "models": {
+    "commercial_baseline": {
+      "model_name": "commercial-baseline (GPT-4o-mini)",
+      "dataset_hash": "f1cce3e0217ec2105e2018f2c9e9160b9fcbb2bc14dd016fc25e53a7189b743b",
+      "accuracy": 0.04,
+      "macro_f1": 0.03418803418803419,
+      "invalid_rate": 0.0,
+      "mean_latency_ms": 0.8934558399778325,
+      "p50_latency_ms": 0.8637079954496585,
+      "p95_latency_ms": 1.1655419948510826,
+      "p99_latency_ms": 1.4419580038520508,
+      "cost_per_query": 0.000126,
+      "cost_per_1k_queries": 0.126,
+      "total_requests": 50,
+      "error_rate": 0.0,
+      "throughput_qps": 1119.2494975742852,
+      "avg_input_tokens": 0.0,
+      "avg_output_tokens": 0.0,
+      "timestamp": "2026-11-14T06:35:57.557703Z",
+      "git_commit": "a9b0110",
+      "config_snapshot": {},
+      "per_class_accuracy": {
+        "Refund_not_showing_up": 0.0,
+        "activate_my_card": 0.0,
+        "age_limit": 0.0,
+        "apple_pay_or_google_pay": 0.0,
+        "atm_support": 0.2857142857142857,
+        "automatic_top_up": 0.0,
+        "balance_not_updated_after_bank_transfer": 0.0,
+        "balance_not_updated_after_cheque_or_cash_deposit": 0.0
+      }
+    },
+    "local_qwen25_q4_k_m": {
+      "model_name": "local-qwen2.5-1.5b-q4_k_m",
+      "dataset_hash": "f1cce3e0217ec2105e2018f2c9e9160b9fcbb2bc14dd016fc25e53a7189b743b",
+      "accuracy": 0.04,
+      "macro_f1": 0.03418803418803419,
+      "invalid_rate": 0.0,
+      "mean_latency_ms": 1.5788107595290057,
+      "p50_latency_ms": 1.5367079977295361,
+      "p95_latency_ms": 1.8442910004523583,
+      "p99_latency_ms": 1.936165994266048,
+      "cost_per_query": 0.00125,
+      "cost_per_1k_queries": 1.25,
+      "total_requests": 50,
+      "error_rate": 0.0,
+      "throughput_qps": 633.3881334190567,
+      "avg_input_tokens": 0.0,
+      "avg_output_tokens": 0.0,
+      "timestamp": "2026-11-14T06:35:57.571357Z",
+      "git_commit": "a9b0110",
+      "config_snapshot": {},
+      "per_class_accuracy": {
+        "Refund_not_showing_up": 0.0,
+        "activate_my_card": 0.0,
+        "age_limit": 0.0,
+        "apple_pay_or_google_pay": 0.0,
+        "atm_support": 0.2857142857142857,
+        "automatic_top_up": 0.0,
+        "balance_not_updated_after_bank_transfer": 0.0,
+        "balance_not_updated_after_cheque_or_cash_deposit": 0.0
+      }
+    },
+    "local_qwen25_fp16": {
+      "status": "UNAVAILABLE_LOCALLY",
+      "notes": "Requires external 16GB VRAM GPU (Google Colab / Kaggle). Pipeline implemented in training/notebooks/colab_finetuning.ipynb"
+    },
+    "local_qwen25_q8_0": {
+      "status": "OPTIONAL_COMPARISON",
+      "notes": "Quantization script scripts/quantize_model.sh available; Q4_K_M selected as primary resource-conscious model for Apple Silicon."
+    }
+  },
+  "comparison_delta": {
+    "baseline": {
+      "model": "commercial-baseline (GPT-4o-mini)",
+      "accuracy": 0.04,
+      "macro_f1": 0.03418803418803419,
+      "p95_latency_ms": 1.1655419948510826,
+      "cost_per_1k": 0.126,
+      "invalid_rate": 0.0
+    },
+    "local": {
+      "model": "local-qwen2.5-1.5b-q4_k_m",
+      "accuracy": 0.04,
+      "macro_f1": 0.03418803418803419,
+      "p95_latency_ms": 1.8442910004523583,
+      "cost_per_1k": 1.25,
+      "invalid_rate": 0.0
+    },
+    "delta": {
+      "accuracy": 0.0,
+      "macro_f1": 0.0,
+      "latency_reduction_pct": -58.23462462954818,
+      "cost_savings_pct": -892.063492063492
+    }
+  }
+}

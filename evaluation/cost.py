@@ -64,28 +64,21 @@ class CostCalculator:
     def break_even_monthly_queries(self, scenario: str = "base") -> float | None:
         """Monthly query volume where local becomes cheaper than API.
 
-        Returns None if local is never cheaper.
+        Monthly fixed cost is the dedicated hardware amortized or rented 24/7.
+        Break-even volume Q* is where monthly API cost (Q * api_cpq) equals
+        the monthly fixed cost of running the local inference server:
+            Q* = monthly_fixed / api_cpq
         """
         api_cpq = self.api_query_cost()
-        local_cpq = self.local_query_cost(scenario)
+        if api_cpq <= 0:
+            return None
 
-        if local_cpq >= api_cpq:
-            return None  # Local is never cheaper per-query
-
-        # Fixed monthly cost = machine running 24/7
         cost_map = {
             "low": self.assumptions.machine_cost_per_hour_low,
             "base": self.assumptions.machine_cost_per_hour_base,
             "high": self.assumptions.machine_cost_per_hour_high,
         }
         monthly_fixed = cost_map.get(scenario, self.assumptions.machine_cost_per_hour_base) * 24 * 30
-        # Break-even: monthly_fixed / (api_cpq - local_cpq) ... but we need to think differently
-        # Monthly API cost = Q * api_cpq
-        # Monthly local cost = monthly_fixed (always on)
-        # Break-even: Q * api_cpq = monthly_fixed
-        # Q = monthly_fixed / api_cpq
-        if api_cpq <= 0:
-            return None
         return monthly_fixed / api_cpq
 
     def sensitivity_analysis(self) -> dict[str, dict[str, float]]:

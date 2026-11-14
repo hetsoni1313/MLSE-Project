@@ -58,7 +58,7 @@ async def update_config(
         from llmops_governance.metrics.database import get_db_manager
         from llmops_governance.metrics.repository import RoutingConfigRepository
 
-        db = get_db_manager()
+        db = getattr(request.app.state, "db_manager", None) or get_db_manager()
         async with db.get_session() as session:
             repo = RoutingConfigRepository(session)
             await repo.save({
@@ -95,7 +95,7 @@ async def rollback_history(
         from llmops_governance.metrics.database import get_db_manager
         from llmops_governance.metrics.repository import RollbackRepository
 
-        db = get_db_manager()
+        db = getattr(request.app.state, "db_manager", None) or get_db_manager()
         async with db.get_session() as session:
             repo = RollbackRepository(session)
             events = await repo.get_recent(20)
@@ -117,6 +117,23 @@ async def rollback_history(
         return {"error": str(e), "rollback_events": []}
 
 
+@router.post("/check-rollback")
+async def trigger_rollback_check(
+    request: Request,
+    _: str = Depends(require_admin_key),
+) -> dict:
+    """Manually trigger an immediate rollback evaluation."""
+    logger_service = getattr(request.app.state, "request_logger", None)
+    if logger_service is not None:
+        await logger_service.flush()
+
+    monitor = getattr(request.app.state, "rollback_monitor", None)
+    if monitor is None:
+        return {"error": "Rollback monitor not active"}
+    result = await monitor.check_now()
+    return {"status": "evaluated", "result": result}
+
+
 @router.post("/reset-rollback")
 async def reset_rollback(
     update: AdminConfigUpdate,
@@ -128,10 +145,14 @@ async def reset_rollback(
     if not engine.is_rolled_back:
         return {"status": "not_in_rollback_state"}
 
+    bp = update.baseline_percentage if update.baseline_percentage is not None else 90
+    lp = update.local_percentage if update.local_percentage is not None else 10
+    mode = update.routing_mode or ("baseline" if lp == 0 else "weighted")
+
     new_config = RoutingConfig(
-        mode=update.routing_mode or "weighted",
-        baseline_percentage=update.baseline_percentage or 90,
-        local_percentage=update.local_percentage or 10,
+        mode=mode,
+        baseline_percentage=bp,
+        local_percentage=lp,
     )
     engine.recover_from_rollback(new_config)
 
