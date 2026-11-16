@@ -2,22 +2,18 @@
 
 from __future__ import annotations
 
-import asyncio
-import json
 import sys
 from pathlib import Path
-from typing import AsyncGenerator
 
 import pytest
-import pytest_asyncio
+from gateway.routing.config import RoutingConfig
+from gateway.routing.engine import RoutingEngine
+
+from llmops_governance.core.constants import BANKING77_LABEL_SET, BANKING77_LABELS
 
 # Ensure project root is on path
 _ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_ROOT))
-
-from gateway.routing.config import RoutingConfig
-from gateway.routing.engine import RoutingEngine
-from llmops_governance.core.constants import BANKING77_LABELS
 
 
 @pytest.fixture
@@ -29,7 +25,6 @@ def banking77_labels() -> list[str]:
 @pytest.fixture
 def banking77_label_set() -> frozenset[str]:
     """Return the Banking77 label set."""
-    from llmops_governance.core.constants import BANKING77_LABEL_SET
     return BANKING77_LABEL_SET
 
 
@@ -65,7 +60,9 @@ def routing_config_weighted() -> RoutingConfig:
 @pytest.fixture
 def routing_config_shadow() -> RoutingConfig:
     """Shadow mode routing config."""
-    return RoutingConfig(mode="shadow", baseline_percentage=100, local_percentage=0, shadow_enabled=True)
+    return RoutingConfig(
+        mode="shadow", baseline_percentage=100, local_percentage=0, shadow_enabled=True
+    )
 
 
 @pytest.fixture
@@ -78,15 +75,64 @@ def routing_engine(routing_config_baseline: RoutingConfig) -> RoutingEngine:
 def sample_predictions() -> list[dict]:
     """Sample prediction results for testing."""
     return [
-        {"prediction": "get_physical_card", "ground_truth": "get_physical_card", "latency_ms": 120.0, "cost": 0.0001},
-        {"prediction": "lost_or_stolen_card", "ground_truth": "lost_or_stolen_card", "latency_ms": 115.0, "cost": 0.0001},
-        {"prediction": "pending_transfer", "ground_truth": "pending_transfer", "latency_ms": 130.0, "cost": 0.0001},
-        {"prediction": "change_pin", "ground_truth": "change_pin", "latency_ms": 110.0, "cost": 0.0001},
-        {"prediction": "cancel_transfer", "ground_truth": "cancel_transfer", "latency_ms": 125.0, "cost": 0.0001},
-        {"prediction": "exchange_rate", "ground_truth": "exchange_rate", "latency_ms": 140.0, "cost": 0.0001},
-        {"prediction": "request_refund", "ground_truth": "request_refund", "latency_ms": 105.0, "cost": 0.0001},
-        {"prediction": "activate_my_card", "ground_truth": "topping_up_by_card", "latency_ms": 135.0, "cost": 0.0001},
-        {"prediction": "contactless_not_working", "ground_truth": "contactless_not_working", "latency_ms": 118.0, "cost": 0.0001},
-        {"prediction": "verify_my_identity", "ground_truth": "verify_my_identity", "latency_ms": 122.0, "cost": 0.0001},
+        {
+            "prediction": "get_physical_card",
+            "ground_truth": "get_physical_card",
+            "latency_ms": 120.0,
+            "cost": 0.0001,
+        },
+        {
+            "prediction": "lost_or_stolen_card",
+            "ground_truth": "lost_or_stolen_card",
+            "latency_ms": 115.0,
+            "cost": 0.0001,
+        },
+        {
+            "prediction": "pending_transfer",
+            "ground_truth": "pending_transfer",
+            "latency_ms": 130.0,
+            "cost": 0.0001,
+        },
+        {
+            "prediction": "change_pin",
+            "ground_truth": "change_pin",
+            "latency_ms": 110.0,
+            "cost": 0.0001,
+        },
+        {
+            "prediction": "cancel_transfer",
+            "ground_truth": "cancel_transfer",
+            "latency_ms": 125.0,
+            "cost": 0.0001,
+        },
+        {
+            "prediction": "exchange_rate",
+            "ground_truth": "exchange_rate",
+            "latency_ms": 140.0,
+            "cost": 0.0001,
+        },
+        {
+            "prediction": "request_refund",
+            "ground_truth": "request_refund",
+            "latency_ms": 105.0,
+            "cost": 0.0001,
+        },
+        {
+            "prediction": "activate_my_card",
+            "ground_truth": "topping_up_by_card",
+            "latency_ms": 135.0,
+            "cost": 0.0001,
+        },
+        {
+            "prediction": "contactless_not_working",
+            "ground_truth": "contactless_not_working",
+            "latency_ms": 118.0,
+            "cost": 0.0001,
+        },
+        {
+            "prediction": "verify_my_identity",
+            "ground_truth": "verify_my_identity",
+            "latency_ms": 122.0,
+            "cost": 0.0001,
+        },
     ]
-

@@ -51,12 +51,29 @@ class ModelComparison:
     ) -> dict:
         """Side-by-side comparison of two models."""
         return {
-            "baseline": {"model": baseline.model_name, "accuracy": baseline.accuracy, "macro_f1": baseline.macro_f1, "p95_latency_ms": baseline.p95_latency_ms, "cost_per_1k": baseline.cost_per_1k_queries},
-            "candidate": {"model": candidate.model_name, "accuracy": candidate.accuracy, "macro_f1": candidate.macro_f1, "p95_latency_ms": candidate.p95_latency_ms, "cost_per_1k": candidate.cost_per_1k_queries},
+            "baseline": {
+                "model": baseline.model_name,
+                "accuracy": baseline.accuracy,
+                "macro_f1": baseline.macro_f1,
+                "p95_latency_ms": baseline.p95_latency_ms,
+                "cost_per_1k": baseline.cost_per_1k_queries,
+            },
+            "candidate": {
+                "model": candidate.model_name,
+                "accuracy": candidate.accuracy,
+                "macro_f1": candidate.macro_f1,
+                "p95_latency_ms": candidate.p95_latency_ms,
+                "cost_per_1k": candidate.cost_per_1k_queries,
+            },
             "delta": {
                 "accuracy": candidate.accuracy - baseline.accuracy,
-                "cost_savings_pct": ((baseline.cost_per_1k_queries - candidate.cost_per_1k_queries) / baseline.cost_per_1k_queries * 100) if baseline.cost_per_1k_queries > 0 else 0,
+                "cost_savings_pct": (
+                    (baseline.cost_per_1k_queries - candidate.cost_per_1k_queries)
+                    / baseline.cost_per_1k_queries
+                    * 100
+                )
+                if baseline.cost_per_1k_queries > 0
+                else 0,
             },
             "promotion": self.check_promotion(candidate),
         }
-

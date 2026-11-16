@@ -91,4 +91,3 @@ class FallbackHandler:
             )
 
         return baseline_result, local_result
-

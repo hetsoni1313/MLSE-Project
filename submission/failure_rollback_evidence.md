@@ -180,3 +180,4 @@ The entire resilience engine is backed by comprehensive automated test suites:
 - **`tests/integration/test_fault_injection.py`**: 8 tests verifying all 6 fault injection modes via HTTP admin endpoints.
 
 **Total Resilience Tests:** **30 tests**, all passing in **< 0.25 seconds**.
+

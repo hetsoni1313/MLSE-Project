@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from sqlalchemy import desc, func, select
@@ -46,9 +46,7 @@ class RequestLogRepository:
         )
         return list(result.scalars().all())
 
-    async def get_recent_with_ground_truth(
-        self, route: str, limit: int = 100
-    ) -> list[RequestLog]:
+    async def get_recent_with_ground_truth(self, route: str, limit: int = 100) -> list[RequestLog]:
         """Get recent requests with ground truth labels for a specific route."""
         result = await self._session.execute(
             select(RequestLog)
@@ -125,7 +123,7 @@ class RequestLogRepository:
         }
 
     async def get_cost_stats(
-        self, route: str | None = None, limit: int = 1000
+        self, route: str | None = None, _limit: int = 1000
     ) -> dict[str, float]:
         """Calculate cost statistics."""
         query = select(
@@ -183,16 +181,14 @@ class ExperimentRepository:
         )
         return list(result.scalars().all())
 
-    async def update_ended(
-        self, experiment_id: str, total_requests: int
-    ) -> None:
+    async def update_ended(self, experiment_id: str, total_requests: int) -> None:
         """Mark an experiment as ended."""
         result = await self._session.execute(
             select(ExperimentRun).where(ExperimentRun.experiment_id == experiment_id)
         )
         exp = result.scalar_one_or_none()
         if exp:
-            exp.ended_at = datetime.now(timezone.utc)
+            exp.ended_at = datetime.now(UTC)
             exp.total_requests = total_requests
 
 
@@ -270,9 +266,6 @@ class RoutingConfigRepository:
     async def get_history(self, limit: int = 50) -> list[RoutingConfigHistory]:
         """Get routing config change history."""
         result = await self._session.execute(
-            select(RoutingConfigHistory)
-            .order_by(desc(RoutingConfigHistory.timestamp))
-            .limit(limit)
+            select(RoutingConfigHistory).order_by(desc(RoutingConfigHistory.timestamp)).limit(limit)
         )
         return list(result.scalars().all())
-

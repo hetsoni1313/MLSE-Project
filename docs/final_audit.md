@@ -123,3 +123,4 @@ During the comprehensive audit, the following engineering defects were identifie
    - *Improvement*: Added `POST /admin/check-rollback` with asynchronous log queue flushing (`request_logger.flush()`) to ensure deterministic immediate evaluation.
 5. **Coverage Expansion**
    - *Improvement*: Added 32 new unit and integration tests covering repository operations, custom exceptions, model comparison promotion checks, and fault injection, raising test coverage from 69.55% to **82.88%** (124 tests passing).
+

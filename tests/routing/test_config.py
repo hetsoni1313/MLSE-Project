@@ -1,8 +1,8 @@
 """Tests for routing config validation."""
 
 import pytest
-from pydantic import ValidationError
 from gateway.routing.config import RoutingConfig
+from pydantic import ValidationError
 
 
 class TestRoutingConfig:
@@ -32,4 +32,3 @@ class TestRoutingConfig:
         assert baseline.mode == "baseline"
         assert baseline.baseline_percentage == 100
         assert baseline.local_percentage == 0
-

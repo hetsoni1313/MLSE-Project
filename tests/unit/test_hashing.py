@@ -1,7 +1,5 @@
 """Tests for hashing utilities."""
 
-import pytest
-
 from llmops_governance.utils.hashing import compute_file_hash, sticky_hash
 
 
@@ -60,4 +58,3 @@ class TestFileHash:
         f1.write_text("content A")
         f2.write_text("content B")
         assert compute_file_hash(str(f1)) != compute_file_hash(str(f2))
-

@@ -15,7 +15,7 @@ def compute_accuracy(predictions: list[str], ground_truth: list[str]) -> float:
     """Exact-match accuracy."""
     if not predictions or len(predictions) != len(ground_truth):
         return 0.0
-    correct = sum(1 for p, g in zip(predictions, ground_truth) if p == g)
+    correct = sum(1 for p, g in zip(predictions, ground_truth, strict=False) if p == g)
     return correct / len(predictions)
 
 
@@ -28,9 +28,10 @@ def compute_macro_f1(predictions: list[str], ground_truth: list[str]) -> float:
     f1_scores: list[float] = []
 
     for cls in classes:
-        tp = sum(1 for p, g in zip(predictions, ground_truth) if p == cls and g == cls)
-        fp = sum(1 for p, g in zip(predictions, ground_truth) if p == cls and g != cls)
-        fn = sum(1 for p, g in zip(predictions, ground_truth) if p != cls and g == cls)
+        pairs = list(zip(predictions, ground_truth, strict=False))
+        tp = sum(1 for p, g in pairs if p == cls and g == cls)
+        fp = sum(1 for p, g in pairs if p == cls and g != cls)
+        fn = sum(1 for p, g in pairs if p != cls and g == cls)
 
         precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
         recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
@@ -40,7 +41,9 @@ def compute_macro_f1(predictions: list[str], ground_truth: list[str]) -> float:
     return statistics.mean(f1_scores) if f1_scores else 0.0
 
 
-def compute_invalid_rate(predictions: list[str], valid_labels: frozenset[str] | None = None) -> float:
+def compute_invalid_rate(
+    predictions: list[str], valid_labels: frozenset[str] | None = None
+) -> float:
     """Percentage of predictions not in the valid label set."""
     if not predictions:
         return 0.0
@@ -52,7 +55,15 @@ def compute_invalid_rate(predictions: list[str], valid_labels: frozenset[str] | 
 def compute_latency_stats(latencies: list[float]) -> dict[str, float]:
     """Compute latency percentile statistics."""
     if not latencies:
-        return {"mean": 0.0, "median": 0.0, "p50": 0.0, "p95": 0.0, "p99": 0.0, "min": 0.0, "max": 0.0}
+        return {
+            "mean": 0.0,
+            "median": 0.0,
+            "p50": 0.0,
+            "p95": 0.0,
+            "p99": 0.0,
+            "min": 0.0,
+            "max": 0.0,
+        }
 
     sorted_lats = sorted(latencies)
     n = len(sorted_lats)
@@ -74,7 +85,7 @@ def compute_per_class_accuracy(
     class_correct: dict[str, int] = defaultdict(int)
     class_total: dict[str, int] = defaultdict(int)
 
-    for pred, gt in zip(predictions, ground_truth):
+    for pred, gt in zip(predictions, ground_truth, strict=False):
         class_total[gt] += 1
         if pred == gt:
             class_correct[gt] += 1
@@ -91,12 +102,10 @@ def compute_per_class_accuracy(
     return result
 
 
-def compute_confusion_counts(
-    predictions: list[str], ground_truth: list[str]
-) -> dict[str, Counter]:
+def compute_confusion_counts(predictions: list[str], ground_truth: list[str]) -> dict[str, Counter]:
     """Build confusion matrix as dict of Counters: gt_label -> Counter(pred_label -> count)."""
     confusion: dict[str, Counter] = defaultdict(Counter)
-    for pred, gt in zip(predictions, ground_truth):
+    for pred, gt in zip(predictions, ground_truth, strict=False):
         confusion[gt][pred] += 1
     return dict(confusion)
 
@@ -106,4 +115,3 @@ def compute_error_rate(errors: list[bool]) -> float:
     if not errors:
         return 0.0
     return sum(1 for e in errors if e) / len(errors)
-

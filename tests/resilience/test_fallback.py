@@ -1,17 +1,25 @@
 """Tests for fallback handler."""
 
-import pytest
 from unittest.mock import AsyncMock
+
+import pytest
 from gateway.backends import ModelBackend, PredictionResult
 from gateway.resilience.fallback import FallbackHandler
 
 
-def _make_backend(name: str, prediction: str = "change_pin", error: str | None = None, valid: bool = True) -> AsyncMock:
+def _make_backend(
+    name: str, prediction: str = "change_pin", error: str | None = None, valid: bool = True
+) -> AsyncMock:
     backend = AsyncMock(spec=ModelBackend)
     backend.name = name
     backend.predict.return_value = PredictionResult(
-        prediction=prediction, latency_ms=100.0, model_name=name,
-        valid_output=valid, error=error, input_tokens=10, output_tokens=5,
+        prediction=prediction,
+        latency_ms=100.0,
+        model_name=name,
+        valid_output=valid,
+        error=error,
+        input_tokens=10,
+        output_tokens=5,
     )
     backend.health_check.return_value = True
     return backend
@@ -79,4 +87,3 @@ class TestFallbackHandler:
         baseline_result, local_result = await handler.predict_shadow("test")
         assert baseline_result.prediction == "baseline_pred"
         assert local_result is not None
-

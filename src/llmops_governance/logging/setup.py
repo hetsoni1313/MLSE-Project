@@ -16,9 +16,9 @@ from typing import Any
 import structlog
 
 __all__ = [
+    "RedactProcessor",
     "configure_logging",
     "get_logger",
-    "RedactProcessor",
 ]
 
 # Sentinel to detect re-configuration
@@ -59,8 +59,8 @@ class RedactProcessor:
 
     def __call__(
         self,
-        logger: Any,
-        method_name: str,
+        _logger: Any,
+        _method_name: str,
         event_dict: dict[str, Any],
     ) -> dict[str, Any]:
         """Process an event dict, replacing redacted keys' values."""

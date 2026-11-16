@@ -16,11 +16,12 @@ logger = get_logger(__name__)
 
 _LABEL_LIST = "\n".join(f"- {label}" for label in BANKING77_LABELS)
 
-_SYSTEM_PROMPT = f"""You are a banking customer intent classifier. Classify the customer message into exactly one of the following 77 intent categories.
-Respond with ONLY the intent label, nothing else.
-
-Intent categories:
-{_LABEL_LIST}"""
+_SYSTEM_PROMPT = (
+    "You are a banking customer intent classifier. Classify the customer message "
+    "into exactly one of the following 77 intent categories.\n"
+    "Respond with ONLY the intent label, nothing else.\n\n"
+    f"Intent categories:\n{_LABEL_LIST}"
+)
 
 
 def _build_messages(message: str) -> list[dict[str, str]]:
@@ -42,9 +43,7 @@ class LocalModelBackend(ModelBackend):
         timeout_ms: int = 10000,
         model_name: str = "local-gguf",
     ) -> None:
-        self._server_url = server_url or os.getenv(
-            "LLAMA_SERVER_URL", "http://localhost:8081"
-        )
+        self._server_url = server_url or os.getenv("LLAMA_SERVER_URL", "http://localhost:8081")
         self._timeout_ms = timeout_ms
         self._model_name = model_name
         self._client: httpx.AsyncClient | None = None
@@ -93,6 +92,34 @@ class LocalModelBackend(ModelBackend):
             if output_tokens > 0 and elapsed > 0:
                 tps = output_tokens / (elapsed / 1000)
 
+        except httpx.TimeoutException:
+            elapsed = (time.perf_counter() - start) * 1000
+            logger.exception("local_model_timeout", latency_ms=elapsed)
+            return PredictionResult(
+                error="Local model timeout",
+                latency_ms=elapsed,
+                model_name=self._model_name,
+                valid_output=False,
+            )
+        except httpx.ConnectError:
+            elapsed = (time.perf_counter() - start) * 1000
+            logger.exception("local_model_unavailable", server=self._server_url)
+            return PredictionResult(
+                error="Local model server unavailable",
+                latency_ms=elapsed,
+                model_name=self._model_name,
+                valid_output=False,
+            )
+        except Exception as e:
+            elapsed = (time.perf_counter() - start) * 1000
+            logger.exception("local_model_error", error=str(e))
+            return PredictionResult(
+                error=str(e),
+                latency_ms=elapsed,
+                model_name=self._model_name,
+                valid_output=False,
+            )
+        else:
             return PredictionResult(
                 prediction=normalized,
                 latency_ms=elapsed,
@@ -104,46 +131,18 @@ class LocalModelBackend(ModelBackend):
                 tokens_per_second=tps,
             )
 
-        except httpx.TimeoutException:
-            elapsed = (time.perf_counter() - start) * 1000
-            logger.error("local_model_timeout", latency_ms=elapsed)
-            return PredictionResult(
-                error="Local model timeout",
-                latency_ms=elapsed,
-                model_name=self._model_name,
-                valid_output=False,
-            )
-        except httpx.ConnectError:
-            elapsed = (time.perf_counter() - start) * 1000
-            logger.error("local_model_unavailable", server=self._server_url)
-            return PredictionResult(
-                error="Local model server unavailable",
-                latency_ms=elapsed,
-                model_name=self._model_name,
-                valid_output=False,
-            )
-        except Exception as e:
-            elapsed = (time.perf_counter() - start) * 1000
-            logger.error("local_model_error", error=str(e))
-            return PredictionResult(
-                error=str(e),
-                latency_ms=elapsed,
-                model_name=self._model_name,
-                valid_output=False,
-            )
-
     async def health_check(self) -> bool:
         """Check if the llama.cpp server is healthy."""
         try:
             client = await self._get_client()
             response = await client.get("/health")
-            return response.status_code == 200  # noqa: PLR2004
         except Exception:
             return False
+        else:
+            return response.status_code == 200  # noqa: PLR2004
 
     async def close(self) -> None:
         """Close the HTTP client."""
         if self._client:
             await self._client.aclose()
             self._client = None
-

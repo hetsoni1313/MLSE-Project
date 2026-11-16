@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import os
 import pathlib
-import pytest
 from unittest.mock import AsyncMock
-from fastapi.testclient import TestClient
 
+import pytest
+from fastapi.testclient import TestClient
 from gateway.backends import ModelBackend, PredictionResult
 from gateway.backends.fault_injection import FaultInjectionBackend
 from gateway.main import create_app

@@ -181,3 +181,4 @@ python scripts/run_failure_demo.py
 | Port 8000 or 8501 already occupied | Run `pkill -f uvicorn` or pass `--port 8005`. |
 | Network latency slows down live curl | Execute `python scripts/run_failure_demo.py` which uses the internal async test harness. |
 | Browser does not load Streamlit | Open `submission/experiment_results.md` and `submission/cost_analysis.md` directly in the IDE to show raw verified tables. |
+

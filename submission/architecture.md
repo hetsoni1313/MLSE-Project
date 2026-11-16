@@ -195,3 +195,4 @@ To ensure production-grade performance on developer workstations (MacBook Air M4
 1. **Metal GPU Acceleration:** Local inference uses `llama.cpp` compiled with Apple Metal Shading Language (`GGML_METAL=1`), executing tensor operations directly on Apple Silicon GPU cores with zero host-device memory copying.
 2. **Q4_K_M Quantization:** Model weights are quantized to 4-bit medium format, compressing the Qwen2.5-1.5B model from 3.1 GB (FP16) down to 986 MB, fitting comfortably within RAM while leaving over 12 GB for the OS and services.
 3. **ARM64 Native Binaries:** All Python wheels and C extensions are compiled natively for `darwin-arm64` without Rosetta 2 translation overhead.
+

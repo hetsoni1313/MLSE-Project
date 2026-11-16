@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 
 from pydantic import BaseModel, Field
 
@@ -11,26 +10,26 @@ from pydantic import BaseModel, Field
 class RequestLogRecord(BaseModel):
     """A single logged request with all tracked metrics."""
 
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     request_id: str
-    user_id: Optional[str] = None
+    user_id: str | None = None
     route: str
     model_name: str
     input_text: str = ""
     predicted_label: str = ""
-    ground_truth_label: Optional[str] = None
-    correct: Optional[bool] = None
+    ground_truth_label: str | None = None
+    correct: bool | None = None
     valid_output: bool = True
     input_tokens: int = 0
     output_tokens: int = 0
     latency_ms: float = 0.0
-    tokens_per_second: Optional[float] = None
+    tokens_per_second: float | None = None
     estimated_cost: float = 0.0
     fallback_used: bool = False
-    fallback_reason: Optional[str] = None
-    error: Optional[str] = None
-    experiment_mode: Optional[str] = None
-    experiment_id: Optional[str] = None
+    fallback_reason: str | None = None
+    error: str | None = None
+    experiment_mode: str | None = None
+    experiment_id: str | None = None
 
 
 class EvaluationResult(BaseModel):
@@ -52,7 +51,7 @@ class EvaluationResult(BaseModel):
     throughput_qps: float = 0.0
     avg_input_tokens: float = 0.0
     avg_output_tokens: float = 0.0
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     git_commit: str = ""
     config_snapshot: dict = Field(default_factory=dict)
     per_class_accuracy: dict[str, float] = Field(default_factory=dict)
@@ -65,7 +64,7 @@ class CostAnalysisResult(BaseModel):
     api_cost_per_1k: float = 0.0
     local_cost_per_query: float = 0.0
     local_cost_per_1k: float = 0.0
-    break_even_monthly_queries: Optional[float] = None
+    break_even_monthly_queries: float | None = None
     monthly_api_cost_at_1k: float = 0.0
     monthly_local_cost_at_1k: float = 0.0
     savings_pct_at_break_even: float = 0.0
@@ -83,8 +82,8 @@ class ExperimentRunRecord(BaseModel):
     baseline_pct: int = 100
     local_pct: int = 0
     model_name: str = ""
-    started_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    ended_at: Optional[datetime] = None
+    started_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    ended_at: datetime | None = None
     total_requests: int = 0
     config_snapshot: dict = Field(default_factory=dict)
 
@@ -93,7 +92,7 @@ class RollbackEventRecord(BaseModel):
     """Record of an automatic rollback event."""
 
     event_id: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     trigger_type: str  # "accuracy" | "error_rate" | "p95_latency"
     metric_value: float
     threshold_value: float
@@ -103,4 +102,3 @@ class RollbackEventRecord(BaseModel):
     new_local_pct: int = 0
     evaluation_window: int = 100
     details: str = ""
-

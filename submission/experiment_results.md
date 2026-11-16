@@ -108,3 +108,4 @@ Across all 350+ requests executed during the automated evaluation harness:
 - **Successful Fallback Interceptions:** **132**
 - **Circuit Breaker State Changes:** 2 (Closed $\to$ Open under simulated failure)
 - **Data Integrity:** 100% of request logs successfully written to PostgreSQL without transaction deadlocks or queue dropouts.
+

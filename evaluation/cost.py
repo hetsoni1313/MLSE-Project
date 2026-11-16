@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 @dataclass
@@ -10,16 +10,16 @@ class PricingAssumptions:
     """Pricing assumptions for cost calculations."""
 
     # Commercial API pricing
-    api_input_price_per_mtok: float = 0.15   # USD per 1M input tokens
+    api_input_price_per_mtok: float = 0.15  # USD per 1M input tokens
     api_output_price_per_mtok: float = 0.60  # USD per 1M output tokens
     api_avg_input_tokens: float = 800.0
     api_avg_output_tokens: float = 10.0
 
     # Local inference pricing
-    machine_cost_per_hour_low: float = 0.05     # Owned hardware (electricity)
-    machine_cost_per_hour_base: float = 0.25    # Small cloud CPU
-    machine_cost_per_hour_high: float = 1.00    # Cloud GPU
-    local_queries_per_hour: float = 200.0       # Conservative estimate
+    machine_cost_per_hour_low: float = 0.05  # Owned hardware (electricity)
+    machine_cost_per_hour_base: float = 0.25  # Small cloud CPU
+    machine_cost_per_hour_high: float = 1.00  # Cloud GPU
+    local_queries_per_hour: float = 200.0  # Conservative estimate
 
     # Training cost (one-time)
     training_cost_usd: float = 0.0  # Free tier Colab
@@ -78,7 +78,9 @@ class CostCalculator:
             "base": self.assumptions.machine_cost_per_hour_base,
             "high": self.assumptions.machine_cost_per_hour_high,
         }
-        monthly_fixed = cost_map.get(scenario, self.assumptions.machine_cost_per_hour_base) * 24 * 30
+        monthly_fixed = (
+            cost_map.get(scenario, self.assumptions.machine_cost_per_hour_base) * 24 * 30
+        )
         return monthly_fixed / api_cpq
 
     def sensitivity_analysis(self) -> dict[str, dict[str, float]]:
@@ -124,4 +126,3 @@ class CostCalculator:
             },
             "sensitivity": self.sensitivity_analysis(),
         }
-

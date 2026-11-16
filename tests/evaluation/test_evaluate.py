@@ -7,11 +7,10 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import httpx
 import pytest
-
 from evaluation.comparison import ModelComparison
 from evaluation.evaluate import Evaluator
 from evaluation.predictions import PredictionRunner
-from gateway.backends import ModelBackend, PredictionResult
+
 from llmops_governance.schemas.metrics import EvaluationResult
 
 
@@ -43,13 +42,27 @@ class TestEvaluator:
     def test_evaluate_from_file(self, tmp_path):
         evaluator = Evaluator(model_name="file-model")
         file_path = tmp_path / "preds.json"
-        file_path.write_text(json.dumps({
-            "dataset_hash": "abc123hash",
-            "predictions": [
-                {"prediction": "change_pin", "ground_truth": "change_pin", "latency_ms": 30.0, "cost": 0.0001},
-                {"prediction": "get_physical_card", "ground_truth": "change_pin", "latency_ms": 35.0, "cost": 0.0001},
-            ]
-        }))
+        file_path.write_text(
+            json.dumps(
+                {
+                    "dataset_hash": "abc123hash",
+                    "predictions": [
+                        {
+                            "prediction": "change_pin",
+                            "ground_truth": "change_pin",
+                            "latency_ms": 30.0,
+                            "cost": 0.0001,
+                        },
+                        {
+                            "prediction": "get_physical_card",
+                            "ground_truth": "change_pin",
+                            "latency_ms": 35.0,
+                            "cost": 0.0001,
+                        },
+                    ],
+                }
+            )
+        )
 
         result = evaluator.evaluate_from_file(str(file_path))
         assert result.accuracy == 0.5
@@ -129,8 +142,12 @@ class TestModelComparison:
 
     def test_compare_side_by_side(self):
         comp = ModelComparison()
-        baseline = EvaluationResult(model_name="base", accuracy=0.90, p95_latency_ms=200.0, cost_per_1k_queries=0.20)
-        candidate = EvaluationResult(model_name="cand", accuracy=0.88, p95_latency_ms=50.0, cost_per_1k_queries=0.05)
+        baseline = EvaluationResult(
+            model_name="base", accuracy=0.90, p95_latency_ms=200.0, cost_per_1k_queries=0.20
+        )
+        candidate = EvaluationResult(
+            model_name="cand", accuracy=0.88, p95_latency_ms=50.0, cost_per_1k_queries=0.05
+        )
 
         res = comp.compare(baseline, candidate)
         assert "baseline" in res

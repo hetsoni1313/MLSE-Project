@@ -183,3 +183,4 @@ The following data was captured during the execution of `./scripts/run_failure_d
 1. **In-Flight Requests during Failure**: If a local request times out, client-perceived latency equals `local_model_timeout_ms` (10s) + baseline latency. The `CircuitBreaker` mitigates this by tripping after 5 consecutive failures, avoiding repeated 10s timeouts.
 2. **Ground-Truth Lag**: Accuracy rollback requires labelled customer feedback. For high-volume unlabelled traffic, error rate and p95 latency rollbacks provide instantaneous protection.
 3. **Database Concurrency**: The request logger uses an async, non-blocking queue (`asyncio.Queue`) with batch worker writes, ensuring DB logging never adds latency to client classification responses.
+

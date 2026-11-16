@@ -2,11 +2,15 @@
 
 from __future__ import annotations
 
+import logging
+
 from fastapi import APIRouter, Depends, Request
 
 from gateway.middleware.auth import require_admin_key
 from gateway.routing.config import RoutingConfig
 from llmops_governance.logging.setup import get_logger
+from llmops_governance.metrics.database import get_db_manager
+from llmops_governance.metrics.repository import RollbackRepository, RoutingConfigRepository
 from llmops_governance.schemas.requests import AdminConfigUpdate
 
 logger = get_logger(__name__)
@@ -55,21 +59,20 @@ async def update_config(
 
     # Log config change to DB
     try:
-        from llmops_governance.metrics.database import get_db_manager
-        from llmops_governance.metrics.repository import RoutingConfigRepository
-
         db = getattr(request.app.state, "db_manager", None) or get_db_manager()
         async with db.get_session() as session:
             repo = RoutingConfigRepository(session)
-            await repo.save({
-                "mode": new_config.mode,
-                "baseline_pct": new_config.baseline_percentage,
-                "local_pct": new_config.local_percentage,
-                "changed_by": "admin",
-                "reason": update.reason or "Admin config update",
-            })
-    except Exception as e:
-        logger.error("config_history_save_failed", error=str(e))
+            await repo.save(
+                {
+                    "mode": new_config.mode,
+                    "baseline_pct": new_config.baseline_percentage,
+                    "local_pct": new_config.local_percentage,
+                    "changed_by": "admin",
+                    "reason": update.reason or "Admin config update",
+                }
+            )
+    except Exception:
+        logging.exception("config_history_save_failed")
 
     logger.info(
         "admin_config_updated",
@@ -92,9 +95,6 @@ async def rollback_history(
 ) -> dict:
     """Get rollback event history."""
     try:
-        from llmops_governance.metrics.database import get_db_manager
-        from llmops_governance.metrics.repository import RollbackRepository
-
         db = getattr(request.app.state, "db_manager", None) or get_db_manager()
         async with db.get_session() as session:
             repo = RollbackRepository(session)
@@ -178,15 +178,13 @@ async def toggle_faults(
     if action == "enable":
         fault_backend.enable()
         return {"status": "enabled"}
-    elif action == "disable":
+    if action == "disable":
         fault_backend.disable()
         return {"status": "disabled"}
-    elif action == "set":
+    if action == "set":
         fault_type = body.get("fault_type", "")
         enabled = body.get("enabled", True)
         kwargs = {k: v for k, v in body.items() if k not in ("action", "fault_type", "enabled")}
         fault_backend.set_fault(fault_type, enabled, **kwargs)
         return {"status": "set", "fault_type": fault_type, "enabled": enabled}
-    else:
-        return {"error": f"Unknown action: {action}"}
-
+    return {"error": f"Unknown action: {action}"}

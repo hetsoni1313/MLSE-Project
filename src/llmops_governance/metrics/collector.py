@@ -79,9 +79,7 @@ class MetricsCollector:
         with self._lock:
             elapsed = max(time.monotonic() - self._start_time, 0.001)
             latencies = self._latencies.copy()
-            accuracy = (
-                self._correct / self._labelled if self._labelled > 0 else 0.0
-            )
+            accuracy = self._correct / self._labelled if self._labelled > 0 else 0.0
             sorted_lats = sorted(latencies) if latencies else [0.0]
 
             return MetricsSummary(
@@ -94,9 +92,7 @@ class MetricsCollector:
                 correct_predictions=self._correct,
                 labelled_predictions=self._labelled,
                 accuracy=accuracy,
-                mean_latency_ms=(
-                    statistics.mean(sorted_lats) if sorted_lats else 0.0
-                ),
+                mean_latency_ms=(statistics.mean(sorted_lats) if sorted_lats else 0.0),
                 p50_latency_ms=_percentile(sorted_lats, 0.50),
                 p95_latency_ms=_percentile(sorted_lats, 0.95),
                 p99_latency_ms=_percentile(sorted_lats, 0.99),
@@ -124,4 +120,3 @@ def _percentile(sorted_values: list[float], pct: float) -> float:
     idx = int(len(sorted_values) * pct)
     idx = min(idx, len(sorted_values) - 1)
     return sorted_values[idx]
-

@@ -116,4 +116,3 @@ FEW_SHOT_EXAMPLES: Final[list[dict[str, str]]] = [
     {"message": "How do I change my PIN number?", "intent": "change_pin"},
     {"message": "I need to cancel a bank transfer", "intent": "cancel_transfer"},
 ]
-

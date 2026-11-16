@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 from typing import Any
 
 from llmops_governance.logging.setup import get_logger
@@ -35,10 +36,8 @@ class RequestLogger:
         self._running = False
         if self._task:
             self._task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._task
-            except asyncio.CancelledError:
-                pass
         # Flush remaining
         await self._flush_queue()
 
@@ -56,7 +55,7 @@ class RequestLogger:
                 repo = RequestLogRepository(session)
                 await repo.save(data)
         except Exception as e:
-            logger.error("request_log_failed", error=str(e))
+            logger.exception("request_log_failed", error=str(e))
 
     async def _writer_loop(self) -> None:
         """Background loop that writes queued log entries to DB."""
@@ -64,12 +63,12 @@ class RequestLogger:
             try:
                 data = await asyncio.wait_for(self._queue.get(), timeout=1.0)
                 await self.log_request_sync(data)
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 continue
             except asyncio.CancelledError:
                 break
             except Exception as e:
-                logger.error("request_logger_error", error=str(e))
+                logger.exception("request_logger_error", error=str(e))
 
     async def flush(self) -> None:
         """Flush all pending items in the queue to DB."""
@@ -83,4 +82,3 @@ class RequestLogger:
                 await self.log_request_sync(data)
             except Exception:
                 break
-

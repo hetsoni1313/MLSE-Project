@@ -7,8 +7,8 @@ and provides the API for intent classification with intelligent routing.
 from __future__ import annotations
 
 import os
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -26,7 +26,7 @@ from gateway.resilience.rollback import RollbackMonitor
 from gateway.routing.config import RoutingConfig
 from gateway.routing.engine import RoutingEngine
 from gateway.services import RequestLogger
-from llmops_governance.config.settings import Settings, get_settings
+from llmops_governance.config.settings import get_settings
 from llmops_governance.logging.setup import configure_logging, get_logger
 from llmops_governance.metrics.collector import MetricsCollector
 from llmops_governance.metrics.database import DatabaseManager
@@ -169,4 +169,3 @@ def create_app() -> FastAPI:
 
 # Application instance
 app = create_app()
-

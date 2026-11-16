@@ -44,7 +44,7 @@ jobs:
 
       - name: Run all tests with coverage
         run: |
-          pytest tests/ -v --tb=short --cov=src/llmops_governance --cov-report=term-missing || true
+          pytest tests/ -v --tb=short --cov=src/llmops_governance --cov-report=term-missing
 
       - name: Validate configs
         run: |

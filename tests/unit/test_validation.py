@@ -1,12 +1,10 @@
 """Tests for label validation and normalization."""
 
-import pytest
-
-from llmops_governance.core.constants import BANKING77_LABELS, BANKING77_LABEL_SET
+from llmops_governance.core.constants import BANKING77_LABEL_SET
 from llmops_governance.utils.validation import (
+    extract_label_from_response,
     normalize_label,
     validate_label,
-    extract_label_from_response,
 )
 
 
@@ -77,4 +75,3 @@ class TestExtractLabel:
         )
         # Should extract the label
         assert "change_pin" in result or result == "change_pin"
-

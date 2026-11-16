@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import os
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
@@ -22,9 +22,7 @@ class DatabaseManager:
     """Manages async database connections with auto-detection of backend."""
 
     def __init__(self, url: str | None = None) -> None:
-        self._url = url or os.getenv(
-            "DATABASE_URL", "sqlite+aiosqlite:///./data/llmops.db"
-        )
+        self._url = url or os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./data/llmops.db")
         self._engine: AsyncEngine | None = None
         self._session_factory: async_sessionmaker[AsyncSession] | None = None
 
@@ -83,7 +81,7 @@ class DatabaseManager:
         """Provide a transactional async session scope."""
         if self._session_factory is None:
             await self.initialize()
-        assert self._session_factory is not None  # noqa: S101
+        assert self._session_factory is not None
 
         async with self._session_factory() as session:
             try:
@@ -116,4 +114,3 @@ async def reset_db_manager() -> None:
     if _db_manager:
         await _db_manager.close()
     _db_manager = None
-

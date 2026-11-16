@@ -1,15 +1,15 @@
 """Tests for evaluation metrics computation."""
 
 import pytest
-
 from evaluation.metrics import (
     compute_accuracy,
-    compute_macro_f1,
+    compute_error_rate,
     compute_invalid_rate,
     compute_latency_stats,
+    compute_macro_f1,
     compute_per_class_accuracy,
-    compute_error_rate,
 )
+
 from llmops_governance.core.constants import BANKING77_LABEL_SET
 
 
@@ -101,4 +101,3 @@ class TestErrorRate:
 
     def test_mixed(self):
         assert compute_error_rate([True, False, False, True]) == 0.5
-

@@ -1,25 +1,27 @@
 """Integration tests for the FastAPI gateway."""
 
+from __future__ import annotations
+
+import os
+import pathlib
+
 import pytest
-from unittest.mock import AsyncMock, patch
 from fastapi.testclient import TestClient
+from gateway.main import create_app
 
 
 @pytest.fixture
 def client():
     """Create a test client with mock backends."""
-    import os
     os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///./data/test_llmops.db"
     os.environ["ADMIN_API_KEY"] = "test-key"
     os.environ["FAULT_INJECTION_ENABLED"] = "true"
 
-    from gateway.main import create_app
     app = create_app()
     with TestClient(app) as c:
         yield c
 
     # Cleanup
-    import pathlib
     test_db = pathlib.Path("./data/test_llmops.db")
     if test_db.exists():
         test_db.unlink()
@@ -40,9 +42,7 @@ class TestHealthEndpoints:
 
 class TestClassifyEndpoint:
     def test_classify_basic(self, client):
-        response = client.post("/classify", json={
-            "message": "I want to change my PIN number"
-        })
+        response = client.post("/classify", json={"message": "I want to change my PIN number"})
         assert response.status_code == 200
         data = response.json()
         assert "prediction" in data
@@ -50,10 +50,13 @@ class TestClassifyEndpoint:
         assert "latency_ms" in data
 
     def test_classify_with_ground_truth(self, client):
-        response = client.post("/classify", json={
-            "message": "How do I change my PIN?",
-            "ground_truth": "change_pin",
-        })
+        response = client.post(
+            "/classify",
+            json={
+                "message": "How do I change my PIN?",
+                "ground_truth": "change_pin",
+            },
+        )
         assert response.status_code == 200
 
     def test_classify_empty_message_rejected(self, client):
@@ -87,4 +90,3 @@ class TestMetricsEndpoint:
         assert response.status_code == 200
         data = response.json()
         assert "total_requests" in data
-

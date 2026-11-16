@@ -5,7 +5,7 @@ from __future__ import annotations
 import asyncio
 import json
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import httpx
@@ -43,16 +43,11 @@ class PredictionRunner:
             List of prediction result dicts
         """
         semaphore = asyncio.Semaphore(self._concurrency)
-        results: list[dict] = []
-
         async with httpx.AsyncClient(timeout=httpx.Timeout(self._timeout)) as client:
             tasks = [
-                self._predict_one(client, semaphore, entry, experiment_id)
-                for entry in dataset
+                self._predict_one(client, semaphore, entry, experiment_id) for entry in dataset
             ]
-            results = await asyncio.gather(*tasks)
-
-        return results
+            return await asyncio.gather(*tasks)
 
     async def _predict_one(
         self,
@@ -111,7 +106,7 @@ class PredictionRunner:
         Path(output_path).parent.mkdir(parents=True, exist_ok=True)
         output = {
             "dataset_hash": dataset_hash,
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "total_predictions": len(predictions),
             "metadata": metadata or {},
             "predictions": predictions,
@@ -119,4 +114,3 @@ class PredictionRunner:
         with open(output_path, "w") as f:
             json.dump(output, f, indent=2)
         logger.info("predictions_saved", path=output_path, count=len(predictions))
-

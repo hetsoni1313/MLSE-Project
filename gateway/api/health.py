@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import contextlib
+
 from fastapi import APIRouter, Request
 
 from llmops_governance.schemas.requests import HealthResponse
@@ -10,7 +12,7 @@ router = APIRouter(tags=["Health"])
 
 
 @router.get("/health", response_model=HealthResponse)
-async def health(request: Request) -> HealthResponse:
+async def health(_request: Request) -> HealthResponse:
     """Basic health check — returns OK if the gateway is running."""
     return HealthResponse(
         status="healthy",
@@ -30,26 +32,20 @@ async def readiness(request: Request) -> HealthResponse:
     try:
         db = app_state.db_manager
         async with db.get_session() as session:
-            await session.execute(
-                __import__("sqlalchemy").text("SELECT 1")
-            )
+            await session.execute(__import__("sqlalchemy").text("SELECT 1"))
             db_ok = True
     except Exception as e:
         details["database_error"] = str(e)
 
     # Check local model
     local_ok = False
-    try:
+    with contextlib.suppress(Exception):
         local_ok = await app_state.local_backend.health_check()
-    except Exception:
-        pass
 
     # Check baseline
     baseline_ok = False
-    try:
+    with contextlib.suppress(Exception):
         baseline_ok = await app_state.baseline_backend.health_check()
-    except Exception:
-        pass
 
     status = "healthy" if db_ok else "degraded"
     if not db_ok:
@@ -63,4 +59,3 @@ async def readiness(request: Request) -> HealthResponse:
         baseline_api=baseline_ok,
         details=details,
     )
-

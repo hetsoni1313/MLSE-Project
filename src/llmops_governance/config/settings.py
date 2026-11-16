@@ -52,8 +52,9 @@ class RoutingSettings(BaseSettings):
     @field_validator("local_percentage")
     @classmethod
     def percentages_sum_to_100(cls, v: int, info: Any) -> int:
+        _TOTAL_PERCENT = 100  # noqa: N806
         baseline = info.data.get("baseline_percentage", 100)
-        if baseline + v != 100:
+        if baseline + v != _TOTAL_PERCENT:
             msg = f"baseline_percentage ({baseline}) + local_percentage ({v}) must equal 100"
             raise ValueError(msg)
         return v
@@ -80,9 +81,7 @@ class ModelSettings(BaseSettings):
     max_concurrent_requests: int = 4
     context_size: int = 2048
     n_threads: int = 4
-    model_cache_dir: str = Field(
-        default=os.path.expanduser("~/.cache/llmops-governance/models")
-    )
+    model_cache_dir: str = Field(default=os.path.expanduser("~/.cache/llmops-governance/models"))
 
 
 class PricingConfig(BaseSettings):
@@ -100,7 +99,7 @@ class PricingConfig(BaseSettings):
 class GatewaySettings(BaseSettings):
     """Gateway server configuration."""
 
-    host: str = "0.0.0.0"  # noqa: S104
+    host: str = "0.0.0.0"
     port: int = 8000
     workers: int = 1
     admin_api_key: str = Field(default="change-me-in-production", alias="ADMIN_API_KEY")
@@ -156,4 +155,3 @@ def get_settings() -> Settings:
         return Settings.from_yaml()
     except Exception:
         return Settings()
-

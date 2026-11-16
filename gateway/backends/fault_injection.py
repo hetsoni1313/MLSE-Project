@@ -9,7 +9,6 @@ from __future__ import annotations
 import asyncio
 import os
 import random
-import time
 from dataclasses import dataclass, field
 
 from gateway.backends import ModelBackend, PredictionResult
@@ -91,7 +90,12 @@ class FaultInjectionBackend(ModelBackend):
             for k, v in kwargs.items():
                 if hasattr(self._state.config, k):
                     setattr(self._state.config, k, v)
-            logger.info("fault_set", fault_type=fault_type, enabled=enabled, **{str(k): v for k, v in kwargs.items()})
+            logger.info(
+                "fault_set",
+                fault_type=fault_type,
+                enabled=enabled,
+                **{str(k): v for k, v in kwargs.items()},
+            )
 
     async def predict(self, message: str) -> PredictionResult:
         """Predict with potential fault injection."""
@@ -141,16 +145,19 @@ class FaultInjectionBackend(ModelBackend):
 
         # When running in dev/test environment where llama-server is not running,
         # synthesize a baseline local prediction for quality/latency tests
-        if result.error and "unavailable" in result.error.lower():
-            if cfg.degraded_accuracy or cfg.invalid_output or cfg.high_latency:
-                result = PredictionResult(
-                    prediction="activate_my_card",
-                    latency_ms=result.latency_ms,
-                    model_name=self._wrapped.name,
-                    valid_output=True,
-                    error=None,
-                    metadata={"synthetic_dev_mode": True},
-                )
+        if (
+            result.error
+            and "unavailable" in result.error.lower()
+            and (cfg.degraded_accuracy or cfg.invalid_output or cfg.high_latency)
+        ):
+            result = PredictionResult(
+                prediction="activate_my_card",
+                latency_ms=result.latency_ms,
+                model_name=self._wrapped.name,
+                valid_output=True,
+                error=None,
+                metadata={"synthetic_dev_mode": True},
+            )
 
         # 5. Invalid output — replace prediction with garbage
         if cfg.invalid_output and random.random() < cfg.invalid_output_rate:  # noqa: S311
@@ -160,7 +167,7 @@ class FaultInjectionBackend(ModelBackend):
 
         # 6. Degraded accuracy — replace prediction with wrong label
         if cfg.degraded_accuracy and random.random() < cfg.degraded_accuracy_rate:  # noqa: S311
-            wrong_labels = [l for l in BANKING77_LABELS if l != result.prediction]
+            wrong_labels = [lbl for lbl in BANKING77_LABELS if lbl != result.prediction]
             result.prediction = random.choice(wrong_labels)  # noqa: S311
             result.metadata["fault_injected"] = "degraded_accuracy"
 
@@ -171,4 +178,3 @@ class FaultInjectionBackend(ModelBackend):
         if self._state.enabled and self._state.config.unavailable:
             return False
         return await self._wrapped.health_check()
-

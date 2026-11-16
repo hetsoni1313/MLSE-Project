@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import os
 import time
-from typing import Any
+from typing import Any, ClassVar
 
 import httpx
 
@@ -23,12 +23,12 @@ from llmops_governance.utils.validation import normalize_label, validate_label
 logger = get_logger(__name__)
 
 # ── Prompt template ───────────────────────────────────────────────────────
-_SYSTEM_PROMPT = """You are a banking customer intent classifier. Given a customer message, classify it into exactly one of the following 77 intent categories.
-
-Respond with ONLY the intent label, nothing else. No explanation, no punctuation, no prefix.
-
-Intent categories:
-{labels}"""
+_SYSTEM_PROMPT = (
+    "You are a banking customer intent classifier. Given a customer message, "
+    "classify it into exactly one of the following 77 intent categories.\n\n"
+    "Respond with ONLY the intent label, nothing else. No explanation, no "
+    "punctuation, no prefix.\n\nIntent categories:\n{labels}"
+)
 
 _LABEL_LIST = "\n".join(f"- {label}" for label in BANKING77_LABELS)
 
@@ -108,6 +108,34 @@ class BaselineAPIBackend(ModelBackend):
             input_tokens = usage.get("prompt_tokens", 0)
             output_tokens = usage.get("completion_tokens", 0)
 
+        except httpx.TimeoutException:
+            elapsed = (time.perf_counter() - start) * 1000
+            logger.exception("baseline_timeout", latency_ms=elapsed)
+            return PredictionResult(
+                error="Baseline API timeout",
+                latency_ms=elapsed,
+                model_name=self._model,
+                valid_output=False,
+            )
+        except httpx.HTTPStatusError as e:
+            elapsed = (time.perf_counter() - start) * 1000
+            logger.exception("baseline_http_error", status=e.response.status_code)
+            return PredictionResult(
+                error=f"HTTP {e.response.status_code}",
+                latency_ms=elapsed,
+                model_name=self._model,
+                valid_output=False,
+            )
+        except Exception as e:
+            elapsed = (time.perf_counter() - start) * 1000
+            logger.exception("baseline_error", error=str(e))
+            return PredictionResult(
+                error=str(e),
+                latency_ms=elapsed,
+                model_name=self._model,
+                valid_output=False,
+            )
+        else:
             return PredictionResult(
                 prediction=normalized,
                 latency_ms=elapsed,
@@ -118,34 +146,6 @@ class BaselineAPIBackend(ModelBackend):
                 raw_response=raw,
             )
 
-        except httpx.TimeoutException:
-            elapsed = (time.perf_counter() - start) * 1000
-            logger.error("baseline_timeout", latency_ms=elapsed)
-            return PredictionResult(
-                error="Baseline API timeout",
-                latency_ms=elapsed,
-                model_name=self._model,
-                valid_output=False,
-            )
-        except httpx.HTTPStatusError as e:
-            elapsed = (time.perf_counter() - start) * 1000
-            logger.error("baseline_http_error", status=e.response.status_code)
-            return PredictionResult(
-                error=f"HTTP {e.response.status_code}",
-                latency_ms=elapsed,
-                model_name=self._model,
-                valid_output=False,
-            )
-        except Exception as e:
-            elapsed = (time.perf_counter() - start) * 1000
-            logger.error("baseline_error", error=str(e))
-            return PredictionResult(
-                error=str(e),
-                latency_ms=elapsed,
-                model_name=self._model,
-                valid_output=False,
-            )
-
     async def health_check(self) -> bool:
         """Check if the API is reachable."""
         if not self._api_key:
@@ -153,9 +153,10 @@ class BaselineAPIBackend(ModelBackend):
         try:
             client = await self._get_client()
             response = await client.get("/models")
-            return response.status_code == 200  # noqa: PLR2004
         except Exception:
             return False
+        else:
+            return response.status_code == 200  # noqa: PLR2004
 
     async def close(self) -> None:
         """Close the HTTP client."""
@@ -171,7 +172,7 @@ class MockBaselineBackend(ModelBackend):
     Uses a small deterministic mapping for reproducible testing.
     """
 
-    _MOCK_PREDICTIONS: dict[str, str] = {
+    _MOCK_PREDICTIONS: ClassVar[dict[str, str]] = {
         "card": "get_physical_card",
         "pin": "change_pin",
         "transfer": "pending_transfer",
@@ -217,4 +218,3 @@ class MockBaselineBackend(ModelBackend):
 
     async def health_check(self) -> bool:
         return True
-

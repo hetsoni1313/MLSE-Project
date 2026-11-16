@@ -1,6 +1,5 @@
 """Tests for circuit breaker."""
 
-import pytest
 from gateway.resilience.circuit_breaker import CircuitBreaker, CircuitState
 
 
@@ -40,4 +39,3 @@ class TestCircuitBreaker:
         assert cb.state == CircuitState.OPEN
         cb.reset()
         assert cb.state == CircuitState.CLOSED
-

@@ -1,7 +1,5 @@
 """Tests for custom exception hierarchy."""
 
-import pytest
-
 from llmops_governance.core.exceptions import (
     BackendError,
     BackendTimeoutError,

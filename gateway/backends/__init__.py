@@ -52,4 +52,3 @@ class ModelBackend(ABC):
     @abstractmethod
     def name(self) -> str:
         """Human-readable backend name."""
-

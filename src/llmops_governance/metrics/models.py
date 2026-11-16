@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy import (
     Boolean,
@@ -29,7 +29,7 @@ class RequestLog(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     timestamp: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
         server_default=func.now(),
     )
     request_id: Mapped[str] = mapped_column(String(64), index=True)
@@ -72,7 +72,7 @@ class ExperimentRun(Base):
     local_pct: Mapped[int] = mapped_column(Integer, default=0)
     model_name: Mapped[str] = mapped_column(String(128), default="")
     started_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+        DateTime(timezone=True), default=lambda: datetime.now(UTC)
     )
     ended_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     total_requests: Mapped[int] = mapped_column(Integer, default=0)
@@ -87,7 +87,7 @@ class RollbackEvent(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     event_id: Mapped[str] = mapped_column(String(64), unique=True, index=True)
     timestamp: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+        DateTime(timezone=True), default=lambda: datetime.now(UTC)
     )
     trigger_type: Mapped[str] = mapped_column(String(32))
     metric_value: Mapped[float] = mapped_column(Float)
@@ -107,7 +107,7 @@ class EvaluationSummary(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     timestamp: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+        DateTime(timezone=True), default=lambda: datetime.now(UTC)
     )
     model_name: Mapped[str] = mapped_column(String(128), index=True)
     dataset_hash: Mapped[str] = mapped_column(String(64), default="")
@@ -129,7 +129,7 @@ class RoutingConfigHistory(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     timestamp: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+        DateTime(timezone=True), default=lambda: datetime.now(UTC)
     )
     mode: Mapped[str] = mapped_column(String(32))
     baseline_pct: Mapped[int] = mapped_column(Integer)
@@ -151,4 +151,3 @@ class CostAssumption(Base):
     currency: Mapped[str] = mapped_column(String(8), default="USD")
     effective_date: Mapped[str] = mapped_column(String(32))
     source_url: Mapped[str] = mapped_column(String(512), default="")
-

@@ -111,3 +111,4 @@ $1,000 │                                               ╱
 1. **Volume-Threshold Decision Boundary:** Organizations handling fewer than 285,000 queries/month should remain on commercial pay-per-token APIs to avoid hardware provisioning overhead.
 2. **Exponential Margin at Enterprise Scale:** At high operational volumes (10 million queries/month), transitioning to local or private-cloud inference saves **\$1,080.00 to \$1,224.00 per month** (an **85.7% to 97.1% cost reduction**).
 3. **Data Sovereignty Dividend:** Beyond direct token savings, local hosting eliminates external compliance audit costs and privacy liabilities under GDPR and HIPAA.
+

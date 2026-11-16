@@ -4,12 +4,11 @@ from __future__ import annotations
 
 import json
 import subprocess
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from evaluation.metrics import (
     compute_accuracy,
-    compute_confusion_counts,
     compute_invalid_rate,
     compute_latency_stats,
     compute_macro_f1,
@@ -27,6 +26,7 @@ def _get_git_commit() -> str:
             capture_output=True,
             text=True,
             timeout=5,
+            check=False,
         )
         return result.stdout.strip() if result.returncode == 0 else "unknown"
     except Exception:
@@ -85,7 +85,7 @@ class Evaluator:
             total_requests=total,
             error_rate=error_rate,
             throughput_qps=throughput,
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             git_commit=_get_git_commit(),
             per_class_accuracy={k: v["accuracy"] for k, v in per_class.items()},
         )
@@ -148,14 +148,17 @@ class Evaluator:
                 "macro_f1": local_result.macro_f1 - baseline_result.macro_f1,
                 "latency_reduction_pct": (
                     (baseline_result.p95_latency_ms - local_result.p95_latency_ms)
-                    / baseline_result.p95_latency_ms * 100
-                    if baseline_result.p95_latency_ms > 0 else 0
+                    / baseline_result.p95_latency_ms
+                    * 100
+                    if baseline_result.p95_latency_ms > 0
+                    else 0
                 ),
                 "cost_savings_pct": (
                     (baseline_result.cost_per_1k_queries - local_result.cost_per_1k_queries)
-                    / baseline_result.cost_per_1k_queries * 100
-                    if baseline_result.cost_per_1k_queries > 0 else 0
+                    / baseline_result.cost_per_1k_queries
+                    * 100
+                    if baseline_result.cost_per_1k_queries > 0
+                    else 0
                 ),
             },
         }
-

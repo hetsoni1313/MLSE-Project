@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Request
 
@@ -11,7 +11,6 @@ from gateway.backends import PredictionResult
 from gateway.routing.engine import Route
 from llmops_governance.logging.setup import get_logger
 from llmops_governance.schemas.requests import ClassifyRequest, ClassifyResponse
-from llmops_governance.utils.validation import validate_label
 
 logger = get_logger(__name__)
 router = APIRouter(tags=["Classification"])
@@ -44,9 +43,7 @@ async def classify(req: ClassifyRequest, request: Request) -> ClassifyResponse:
     try:
         if route == Route.SHADOW:
             # Shadow mode: return baseline, run local silently
-            baseline_result, local_result = await fallback_handler.predict_shadow(
-                req.message
-            )
+            baseline_result, local_result = await fallback_handler.predict_shadow(req.message)
             result = baseline_result
             if local_result:
                 shadow_prediction = local_result.prediction
@@ -54,8 +51,8 @@ async def classify(req: ClassifyRequest, request: Request) -> ClassifyResponse:
 
         elif route == Route.LOCAL:
             # Try local with fallback
-            result, fallback_used, fallback_reason = (
-                await fallback_handler.predict_with_fallback(req.message)
+            result, fallback_used, fallback_reason = await fallback_handler.predict_with_fallback(
+                req.message
             )
             actual_route = "baseline" if fallback_used else "local"
 
@@ -66,7 +63,7 @@ async def classify(req: ClassifyRequest, request: Request) -> ClassifyResponse:
 
     except Exception as e:
         elapsed = (time.perf_counter() - start) * 1000
-        logger.error("classify_error", error=str(e))
+        logger.exception("classify_error", error=str(e))
         return ClassifyResponse(
             request_id=req.request_id or "",
             prediction="",
@@ -94,7 +91,7 @@ async def classify(req: ClassifyRequest, request: Request) -> ClassifyResponse:
 
     # Log the request (non-blocking)
     log_data = {
-        "timestamp": datetime.now(timezone.utc),
+        "timestamp": datetime.now(UTC),
         "request_id": req.request_id or "",
         "user_id": req.user_id,
         "route": actual_route,
@@ -164,4 +161,3 @@ def _estimate_cost(
         # Local model — cost is based on machine cost per query
         # Default: ~$0.0001 per query for local hardware
         return 0.0001
-

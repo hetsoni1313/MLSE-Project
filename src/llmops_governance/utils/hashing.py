@@ -6,10 +6,10 @@ import hashlib
 from pathlib import Path
 
 __all__ = [
-    "file_hash_sha256",
     "compute_file_hash",
-    "route_for_user",
     "consistent_hash",
+    "file_hash_sha256",
+    "route_for_user",
     "sticky_hash",
 ]
 
@@ -44,7 +44,7 @@ def sticky_hash(key: str, num_buckets: int, seed: int = 0) -> int:
     """
     if num_buckets < 1:
         raise ValueError(f"num_buckets must be >= 1, got {num_buckets}")
-    digest = hashlib.sha256(f"{key}{seed}".encode("utf-8")).hexdigest()
+    digest = hashlib.sha256(f"{key}{seed}".encode()).hexdigest()
     return int(digest, 16) % num_buckets
 
 
@@ -58,8 +58,9 @@ def route_for_user(
     hash_seed: int = 42,
 ) -> str:
     """Deterministic sticky routing of a user to local or cloud."""
-    if not 0 <= local_percentage <= 100:
+    _MAX_PERCENT = 100  # noqa: N806
+    if not 0 <= local_percentage <= _MAX_PERCENT:
         raise ValueError(f"local_percentage must be between 0 and 100, got {local_percentage}")
-    digest = hashlib.sha256(f"{user_id}{hash_seed}".encode("utf-8")).hexdigest()
-    bucket = int(digest, 16) % 100
+    digest = hashlib.sha256(f"{user_id}{hash_seed}".encode()).hexdigest()
+    bucket = int(digest, 16) % _MAX_PERCENT
     return "local" if bucket < local_percentage else "cloud"

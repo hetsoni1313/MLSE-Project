@@ -19,13 +19,16 @@ class RoutingConfig(BaseModel):
     @model_validator(mode="after")
     def validate_percentages(self) -> RoutingConfig:
         """Ensure percentages sum to 100."""
-        if self.mode in ("weighted", "canary"):
-            if self.baseline_percentage + self.local_percentage != 100:
-                msg = (
-                    f"baseline_percentage ({self.baseline_percentage}) + "
-                    f"local_percentage ({self.local_percentage}) must equal 100"
-                )
-                raise ValueError(msg)
+        _TOTAL_PERCENT = 100  # noqa: N806
+        if (
+            self.mode in ("weighted", "canary")
+            and self.baseline_percentage + self.local_percentage != _TOTAL_PERCENT
+        ):
+            msg = (
+                f"baseline_percentage ({self.baseline_percentage}) + "
+                f"local_percentage ({self.local_percentage}) must equal 100"
+            )
+            raise ValueError(msg)
         return self
 
     def to_baseline_only(self) -> RoutingConfig:
@@ -37,4 +40,3 @@ class RoutingConfig(BaseModel):
             sticky_enabled=self.sticky_enabled,
             shadow_enabled=False,
         )
-

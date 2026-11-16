@@ -44,8 +44,7 @@ class RollbackTriggered(LLMOpsError):
         self.value = value
         self.threshold = threshold
         super().__init__(
-            f"Rollback triggered: {trigger} = {value:.4f} "
-            f"(threshold: {threshold:.4f})"
+            f"Rollback triggered: {trigger} = {value:.4f} (threshold: {threshold:.4f})"
         )
 
 
@@ -59,4 +58,3 @@ class ModelNotAvailableError(LLMOpsError):
     def __init__(self, model: str, reason: str = "") -> None:
         self.model = model
         super().__init__(f"Model {model!r} not available: {reason}")
-

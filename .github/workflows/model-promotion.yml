@@ -66,7 +66,7 @@ jobs:
               comparison = ModelComparison(min_acc, max_lat, max_inv)
 
               # Test passing scenario
-              from src.llmops_governance.schemas.metrics import EvaluationResult
+              from llmops_governance.schemas.metrics import EvaluationResult
               passing = EvaluationResult(model_name='test-pass', accuracy=0.90, p95_latency_ms=2000, invalid_rate=0.02, total_requests=100)
               gate = comparison.check_promotion(passing)
               assert gate['promoted'], 'Passing model should be promoted'

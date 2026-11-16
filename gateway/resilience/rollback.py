@@ -8,18 +8,27 @@ when performance degrades.
 from __future__ import annotations
 
 import asyncio
+import contextlib
+import logging
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING
 
-from gateway.routing.engine import RoutingEngine
 from llmops_governance.logging.setup import get_logger
-from llmops_governance.metrics.database import DatabaseManager
 from llmops_governance.metrics.repository import (
     RequestLogRepository,
     RollbackRepository,
 )
 
+if TYPE_CHECKING:
+    from gateway.routing.engine import RoutingEngine
+    from llmops_governance.metrics.database import DatabaseManager
+
 logger = get_logger(__name__)
+
+# Constants
+_MIN_SAMPLE_THRESHOLD = 10
+_P95_PERCENTILE = 0.95
 
 
 class RollbackMonitor:
@@ -75,10 +84,8 @@ class RollbackMonitor:
         self._running = False
         if self._task:
             self._task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._task
-            except asyncio.CancelledError:
-                pass
         logger.info("rollback_monitor_stopped")
 
     async def _monitor_loop(self) -> None:
@@ -90,7 +97,7 @@ class RollbackMonitor:
             except asyncio.CancelledError:
                 break
             except Exception as e:
-                logger.error("rollback_monitor_error", error=str(e))
+                logging.exception("rollback_monitor_error", extra={"error": str(e)})
 
     async def _evaluate(self) -> None:
         """Evaluate recent local model performance."""
@@ -100,52 +107,49 @@ class RollbackMonitor:
         if config.local_percentage == 0 or self._routing.is_rolled_back:
             return
 
-        async with self._lock:
-            async with self._db.get_session() as session:
-                repo = RequestLogRepository(session)
+        async with self._lock, self._db.get_session() as session:
+            repo = RequestLogRepository(session)
 
-                # Check error rate
-                recent = await repo.get_recent_by_route("local", self._window)
-                if len(recent) >= 10:  # Need at least 10 requests
-                    error_count = sum(1 for r in recent if r.error is not None)
-                    error_rate = error_count / len(recent)
-                    if error_rate > self._max_error_rate:
-                        await self._trigger_rollback(
-                            session,
-                            trigger="error_rate",
-                            value=error_rate,
-                            threshold=self._max_error_rate,
-                        )
-                        return
+            # Check error rate
+            recent = await repo.get_recent_by_route("local", self._window)
+            if len(recent) >= _MIN_SAMPLE_THRESHOLD:
+                error_count = sum(1 for r in recent if r.error is not None)
+                error_rate = error_count / len(recent)
+                if error_rate > self._max_error_rate:
+                    await self._trigger_rollback(
+                        session,
+                        trigger="error_rate",
+                        value=error_rate,
+                        threshold=self._max_error_rate,
+                    )
+                    return
 
-                # Check p95 latency
-                if len(recent) >= 10:
-                    latencies = sorted([r.latency_ms for r in recent])
-                    p95_idx = min(int(len(latencies) * 0.95), len(latencies) - 1)
-                    p95 = latencies[p95_idx]
-                    if p95 > self._max_p95_latency_ms:
-                        await self._trigger_rollback(
-                            session,
-                            trigger="p95_latency",
-                            value=p95,
-                            threshold=self._max_p95_latency_ms,
-                        )
-                        return
+            # Check p95 latency
+            if len(recent) >= _MIN_SAMPLE_THRESHOLD:
+                latencies = sorted(r.latency_ms for r in recent)
+                p95_idx = min(int(len(latencies) * _P95_PERCENTILE), len(latencies) - 1)
+                p95 = latencies[p95_idx]
+                if p95 > self._max_p95_latency_ms:
+                    await self._trigger_rollback(
+                        session,
+                        trigger="p95_latency",
+                        value=p95,
+                        threshold=self._max_p95_latency_ms,
+                    )
+                    return
 
-                # Check accuracy (only with sufficient ground truth)
-                labelled = await repo.get_recent_with_ground_truth(
-                    "local", self._window
-                )
-                if len(labelled) >= self._min_labelled:
-                    correct = sum(1 for r in labelled if r.correct)
-                    accuracy = correct / len(labelled)
-                    if accuracy < self._min_accuracy:
-                        await self._trigger_rollback(
-                            session,
-                            trigger="accuracy",
-                            value=accuracy,
-                            threshold=self._min_accuracy,
-                        )
+            # Check accuracy (only with sufficient ground truth)
+            labelled = await repo.get_recent_with_ground_truth("local", self._window)
+            if len(labelled) >= self._min_labelled:
+                correct = sum(1 for r in labelled if r.correct)
+                accuracy = correct / len(labelled)
+                if accuracy < self._min_accuracy:
+                    await self._trigger_rollback(
+                        session,
+                        trigger="accuracy",
+                        value=accuracy,
+                        threshold=self._min_accuracy,
+                    )
 
     async def _trigger_rollback(
         self,
@@ -169,22 +173,24 @@ class RollbackMonitor:
 
         if isinstance(session, AsyncSession):
             rollback_repo = RollbackRepository(session)
-            await rollback_repo.save({
-                "event_id": event_id,
-                "timestamp": datetime.now(timezone.utc),
-                "trigger_type": trigger,
-                "metric_value": value,
-                "threshold_value": threshold,
-                "previous_baseline_pct": config.baseline_percentage,
-                "previous_local_pct": config.local_percentage,
-                "new_baseline_pct": 100,
-                "new_local_pct": 0,
-                "evaluation_window": self._window,
-                "details": (
-                    f"Automatic rollback: {trigger}={value:.4f} "
-                    f"exceeded threshold={threshold:.4f}"
-                ),
-            })
+            await rollback_repo.save(
+                {
+                    "event_id": event_id,
+                    "timestamp": datetime.now(UTC),
+                    "trigger_type": trigger,
+                    "metric_value": value,
+                    "threshold_value": threshold,
+                    "previous_baseline_pct": config.baseline_percentage,
+                    "previous_local_pct": config.local_percentage,
+                    "new_baseline_pct": 100,
+                    "new_local_pct": 0,
+                    "evaluation_window": self._window,
+                    "details": (
+                        f"Automatic rollback: {trigger}={value:.4f} "
+                        f"exceeded threshold={threshold:.4f}"
+                    ),
+                }
+            )
             await session.commit()
 
         self._last_rollback_event_id = event_id
@@ -206,4 +212,3 @@ class RollbackMonitor:
             "current_local_pct": config.local_percentage,
             "last_rollback_event": self._last_rollback_event_id,
         }
-

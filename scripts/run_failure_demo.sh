@@ -11,3 +11,4 @@ if [ -f "venv/bin/activate" ]; then
 fi
 
 python3 scripts/run_failure_demo.py
+

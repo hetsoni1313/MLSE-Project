@@ -26,4 +26,3 @@ async def require_admin_key(
         raise HTTPException(status_code=403, detail="Invalid API key")
 
     return api_key
-

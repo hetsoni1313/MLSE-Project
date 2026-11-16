@@ -28,4 +28,3 @@ async def get_metrics(request: Request) -> dict:
         "requests_per_second": round(summary.requests_per_second, 2),
         "route_distribution": summary.route_distribution,
     }
-

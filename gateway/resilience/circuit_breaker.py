@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-import time
 import threading
+import time
 from enum import Enum
 
 
 class CircuitState(str, Enum):
-    CLOSED = "closed"      # Normal operation
-    OPEN = "open"          # Failing — reject requests
+    CLOSED = "closed"  # Normal operation
+    OPEN = "open"  # Failing — reject requests
     HALF_OPEN = "half_open"  # Testing recovery
 
 
@@ -53,11 +53,7 @@ class CircuitBreaker:
         """Check if a request should be allowed through."""
         with self._lock:
             self._check_recovery()
-            if self._state == CircuitState.CLOSED:
-                return True
-            if self._state == CircuitState.HALF_OPEN:
-                return True  # Allow probe
-            return False  # OPEN — reject
+            return self._state in (CircuitState.CLOSED, CircuitState.HALF_OPEN)
 
     def record_success(self) -> None:
         """Record a successful request."""
@@ -75,9 +71,9 @@ class CircuitBreaker:
         with self._lock:
             self._failure_count += 1
             self._last_failure_time = time.monotonic()
-            if self._state == CircuitState.HALF_OPEN:
-                self._state = CircuitState.OPEN
-            elif self._failure_count >= self._failure_threshold:
+            if self._state == CircuitState.HALF_OPEN or (
+                self._failure_count >= self._failure_threshold
+            ):
                 self._state = CircuitState.OPEN
 
     def reset(self) -> None:
@@ -85,4 +81,3 @@ class CircuitBreaker:
         with self._lock:
             self._state = CircuitState.CLOSED
             self._failure_count = 0
-

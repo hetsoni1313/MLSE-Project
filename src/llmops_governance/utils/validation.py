@@ -12,13 +12,13 @@ import re
 import string
 from typing import Final
 
-from llmops_governance.core.constants import BANKING77_LABELS, BANKING77_LABEL_SET
+from llmops_governance.core.constants import BANKING77_LABEL_SET, BANKING77_LABELS
 
 __all__ = [
+    "extract_label_from_response",
+    "find_closest_label",
     "normalize_label",
     "validate_label",
-    "find_closest_label",
-    "extract_label_from_response",
 ]
 
 _BANKING77_SET: Final[frozenset[str]] = BANKING77_LABEL_SET
@@ -33,7 +33,7 @@ _RE_THE_INTENT_IS = re.compile(
     r"^(?:the\s+)?(?:intent|label|category|predicted\s+intent)\s+(?:is|was|should\s+be)\s+",
     re.IGNORECASE,
 )
-_RE_QUOTES = re.compile(r"[\"'`""'']")
+_RE_QUOTES = re.compile(r"[\"'`" "'']")
 _RE_PUNCTUATION_EXCEPT_UNDERSCORE = re.compile(
     rf"[{re.escape(string.punctuation.replace('_', ''))}]"
 )
@@ -80,9 +80,7 @@ def normalize_label(label: str) -> str:
 
     # Collapse underscores and strip boundary underscores
     text = re.sub(r"_+", "_", text)
-    text = text.strip("_")
-
-    return text
+    return text.strip("_")
 
 
 def validate_label(

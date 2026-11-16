@@ -8,24 +8,28 @@ from __future__ import annotations
 
 import functools
 import time
+from collections.abc import Callable
 from types import TracebackType
-from typing import Any, Callable, TypeVar
+from typing import Any, TypeVar
 
 import structlog
 
 __all__ = [
     "async_timer",
+    "format_duration",
     "measure_latency",
     "sync_timer",
-    "format_duration",
 ]
 
 F = TypeVar("F", bound=Callable[..., Any])
 
 logger = structlog.get_logger(__name__)
 
+_MS_PER_SECOND = 1_000.0
+_SECONDS_PER_MINUTE = 60.0
 
-class async_timer:  # noqa: N801 – lowercase for context-manager convention
+
+class async_timer:  # noqa: N801 - lowercase for context-manager convention
     """Async context manager that measures wall-clock time in milliseconds.
 
     Example::
@@ -35,7 +39,7 @@ class async_timer:  # noqa: N801 – lowercase for context-manager convention
         print(f"Took {t.elapsed_ms:.2f} ms")
     """
 
-    __slots__ = ("_start", "_end")
+    __slots__ = ("_end", "_start")
 
     def __init__(self) -> None:
         self._start: float = 0.0
@@ -43,7 +47,7 @@ class async_timer:  # noqa: N801 – lowercase for context-manager convention
 
     # -- async context manager protocol --
 
-    async def __aenter__(self) -> "async_timer":
+    async def __aenter__(self) -> async_timer:
         self._start = time.perf_counter()
         self._end = None
         return self
@@ -66,7 +70,7 @@ class async_timer:  # noqa: N801 – lowercase for context-manager convention
         time elapsed *so far*.
         """
         end = self._end if self._end is not None else time.perf_counter()
-        return (end - self._start) * 1_000.0
+        return (end - self._start) * _MS_PER_SECOND
 
 
 class sync_timer:  # noqa: N801
@@ -79,13 +83,13 @@ class sync_timer:  # noqa: N801
         print(f"Took {t.elapsed_ms:.2f} ms")
     """
 
-    __slots__ = ("_start", "_end")
+    __slots__ = ("_end", "_start")
 
     def __init__(self) -> None:
         self._start: float = 0.0
         self._end: float | None = None
 
-    def __enter__(self) -> "sync_timer":
+    def __enter__(self) -> sync_timer:
         self._start = time.perf_counter()
         self._end = None
         return self
@@ -102,7 +106,7 @@ class sync_timer:  # noqa: N801
     def elapsed_ms(self) -> float:
         """Wall-clock elapsed time in milliseconds."""
         end = self._end if self._end is not None else time.perf_counter()
-        return (end - self._start) * 1_000.0
+        return (end - self._start) * _MS_PER_SECOND
 
 
 def measure_latency(func: F) -> F:
@@ -128,12 +132,9 @@ def measure_latency(func: F) -> F:
     async def wrapper(*args: Any, **kwargs: Any) -> Any:
         start = time.perf_counter()
         try:
-            result = await func(*args, **kwargs)
-            return result
-        except Exception:
-            raise
+            return await func(*args, **kwargs)
         finally:
-            elapsed_ms = (time.perf_counter() - start) * 1_000.0
+            elapsed_ms = (time.perf_counter() - start) * _MS_PER_SECOND
             logger.info(
                 "function_executed",
                 function=func.__qualname__,
@@ -147,12 +148,12 @@ def format_duration(ms: float) -> str:
     """Format milliseconds into a human-readable duration string.
 
     Rules:
-    * < 1 000 ms  → ``"456ms"``
-    * < 60 000 ms → ``"1.23s"``
-    * ≥ 60 000 ms → ``"1m 23s"``
+    * < 1 000 ms  -> ``"456ms"``
+    * < 60 000 ms -> ``"1.23s"``
+    * >= 60 000 ms -> ``"1m 23s"``
 
     Args:
-        ms: Duration in milliseconds (must be ≥ 0).
+        ms: Duration in milliseconds (must be >= 0).
 
     Returns:
         Human-readable duration string.
@@ -163,11 +164,11 @@ def format_duration(ms: float) -> str:
     if ms < 0:
         raise ValueError(f"Duration must be non-negative, got {ms}")
 
-    if ms < 1_000.0:
+    if ms < _MS_PER_SECOND:
         return f"{ms:.0f}ms"
 
-    seconds = ms / 1_000.0
-    if seconds < 60.0:
+    seconds = ms / _MS_PER_SECOND
+    if seconds < _SECONDS_PER_MINUTE:
         return f"{seconds:.2f}s"
 
     minutes = int(seconds // 60)

@@ -1,6 +1,5 @@
 """Tests for canary deployment stages."""
 
-import pytest
 from gateway.routing.config import RoutingConfig
 from gateway.routing.engine import RoutingEngine
 
@@ -8,8 +7,11 @@ from gateway.routing.engine import RoutingEngine
 class TestCanaryDeployment:
     def test_advance_canary_stages(self):
         config = RoutingConfig(
-            mode="canary", baseline_percentage=95, local_percentage=5,
-            canary_stages=[5, 25, 50, 100], current_canary_stage=0
+            mode="canary",
+            baseline_percentage=95,
+            local_percentage=5,
+            canary_stages=[5, 25, 50, 100],
+            current_canary_stage=0,
         )
         engine = RoutingEngine(config)
 
@@ -28,10 +30,12 @@ class TestCanaryDeployment:
 
     def test_canary_at_final_stage(self):
         config = RoutingConfig(
-            mode="canary", baseline_percentage=0, local_percentage=100,
-            canary_stages=[5, 25, 50, 100], current_canary_stage=3
+            mode="canary",
+            baseline_percentage=0,
+            local_percentage=100,
+            canary_stages=[5, 25, 50, 100],
+            current_canary_stage=3,
         )
         engine = RoutingEngine(config)
         new_pct = engine.advance_canary()
         assert new_pct == 100  # Already at final stage
-

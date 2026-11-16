@@ -382,3 +382,4 @@ The **Intelligent LLMOps Cost & Latency Governance Platform** demonstrates that 
 5. Qwen Team. (2024). *Qwen2.5: A Party of Foundation and Large Language Models*. Alibaba Group.
 6. Fowler, M. (2004). *Strangler Fig Application*. MartinFowler.com.
 7. Nygard, M. T. (2018). *Release It!: Design and Deploy Production-Ready Software*. Pragmatic Bookshelf.
+
